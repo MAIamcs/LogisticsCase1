@@ -1,0 +1,77 @@
+name: Deploy frontend to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    if: github.ref == 'refs/heads/main'
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      VITE_DATA_MODE: ${{ vars.VITE_DATA_MODE || 'demo' }}
+      VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+      VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || (endsWith(github.event.repository.name, '.github.io') && '/') || format('/{0}/', github.event.repository.name) }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: pnpm install --frozen-lockfile
+      - name: Require HTTPS for the separately hosted production API
+        run: |
+          node --input-type=module -e '
+            if (process.env.VITE_DATA_MODE === "api" && !process.env.VITE_API_BASE_URL?.startsWith("https://")) {
+              throw new Error("Pages API mode requires an HTTPS VITE_API_BASE_URL");
+            }
+          '
+      - run: pnpm build
+      - name: Verify the exact artifact before upload
+        run: pnpm check:build --serve
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: frontend/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: false
+      - uses: actions/deploy-pages@v4
+        id: deployment

@@ -1,0 +1,89 @@
+{
+  "$defs": {
+    "Metadata": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "synthetic",
+            "model"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "is_synthetic": {
+          "title": "Is Synthetic",
+          "type": "boolean"
+        },
+        "disclaimer": {
+          "minLength": 1,
+          "title": "Disclaimer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "source",
+        "is_synthetic",
+        "disclaimer"
+      ],
+      "title": "Metadata",
+      "type": "object"
+    },
+    "Scenario": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9-]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "period": {
+          "title": "Period",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "period"
+      ],
+      "title": "Scenario",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "$ref": "#/$defs/Metadata"
+    },
+    "data": {
+      "items": {
+        "$ref": "#/$defs/Scenario"
+      },
+      "title": "Data",
+      "type": "array"
+    }
+  },
+  "required": [
+    "meta",
+    "data"
+  ],
+  "title": "ScenarioListResponse",
+  "type": "object"
+}

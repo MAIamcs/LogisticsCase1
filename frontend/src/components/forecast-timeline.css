@@ -1,0 +1,28 @@
+.forecast-timeline .timeline-inner { display: grid; grid-template-columns: 60px minmax(0, 1fr); align-items: center; gap: 24px; min-height: 80px; padding-block: 12px 9px; }
+.forecast-timeline .timeline-current { display: flex; flex-direction: column; gap: 2px; color: #536b7f; font-size: 11px; }
+.forecast-timeline .timeline-current output { font-size: 22px; font-weight: 600; line-height: 1.2; color: #244c6a; font-variant-numeric: tabular-nums; }
+.forecast-timeline .timeline-control { min-width: 0; }
+.forecast-timeline .timeline-track { position: relative; height: 31px; }
+.forecast-timeline .timeline-track-line, .forecast-timeline .timeline-interval { position: absolute; top: 18px; height: 4px; border-radius: 2px; pointer-events: none; }
+.forecast-timeline .timeline-track-line { left: 9px; right: 9px; background: #becbd5; }
+.forecast-timeline .timeline-interval { z-index: 1; background: #b54a50; height: 5px; }
+.forecast-timeline input[type="range"] { display: block; position: absolute; top: 8px; width: 100%; height: 24px; margin: 0; background: transparent; appearance: none; -webkit-appearance: none; cursor: pointer; accent-color: #326d99; }
+.forecast-timeline input[type="range"]::-webkit-slider-runnable-track { background: transparent; height: 4px; }
+.forecast-timeline input[type="range"]::-moz-range-track { background: transparent; height: 4px; }
+.forecast-timeline input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #346d98; border: 2px solid #fff; box-shadow: 0 0 0 1px #346d98; margin-top: -6px; position: relative; z-index: 2; }
+.forecast-timeline input[type="range"]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: #346d98; border: 2px solid #fff; box-shadow: 0 0 0 1px #346d98; }
+.forecast-timeline .timeline-critical-marker { position: absolute; top: -3px; transform: translateX(-50%); width: 18px; height: 18px; min-height: 0; padding: 0; border: 1px solid #a6383e; border-radius: 3px; background: #fff; color: #a6383e; font-size: 11px; font-weight: 700; line-height: 1; z-index: 3; }
+.forecast-timeline .timeline-critical-marker::after { content: ''; position: absolute; top: 16px; left: 7px; height: 5px; width: 1px; background: #a6383e; }
+.forecast-timeline .timeline-critical-marker:hover, .forecast-timeline .timeline-critical-marker.selected { background: #a6383e; color: #fff; }
+.forecast-timeline .timeline-years { position: relative; height: 22px; }
+.forecast-timeline .timeline-years button { position: absolute; top: 1px; transform: translateX(-50%); padding: 3px 2px; border: 0; border-radius: 2px; background: transparent; font-size: 11px; color: #607487; line-height: 1.2; }
+.forecast-timeline .timeline-years button:first-child { transform: translateX(-20%); }
+.forecast-timeline .timeline-years button:last-child { transform: translateX(-80%); }
+.forecast-timeline .timeline-years button.active { font-weight: 700; color: #244f72; }
+.forecast-timeline .timeline-years button:hover { background: #edf3f8; }
+.forecast-timeline .timeline-state { color: #617485; font-size: 11px; padding-top: 2px; }
+@media (max-width: 580px) {
+  .forecast-timeline .timeline-inner { grid-template-columns: 45px minmax(0, 1fr); gap: 14px; min-height: 76px; padding-block: 9px 7px; }
+  .forecast-timeline .timeline-current output { font-size: 19px; }
+  .forecast-timeline .timeline-years button { font-size: 10px; }
+}

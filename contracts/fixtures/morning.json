@@ -1,0 +1,256 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "source": "synthetic",
+    "is_synthetic": true,
+    "disclaimer": "Синтетические данные для демонстрации интерфейса. Не прогноз и не фактические измерения. Геометрия связей схематична."
+  },
+  "data": {
+    "scenario": {
+      "id": "morning",
+      "name": "Утренний час пик",
+      "description": "Учебный набор транспортных связей агломерации",
+      "period": "07:00–09:00"
+    },
+    "summary": {
+      "daily_trips": 98400,
+      "mean_travel_time_min": 30.2,
+      "mean_load_percent": 62.7
+    },
+    "corridors": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "id": "c1",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                82.931,
+                55.03
+              ],
+              [
+                82.951,
+                55.009
+              ],
+              [
+                82.983,
+                54.978
+              ],
+              [
+                83.045,
+                54.946
+              ],
+              [
+                83.091,
+                54.912
+              ],
+              [
+                83.106,
+                54.854
+              ]
+            ]
+          },
+          "properties": {
+            "id": "c1",
+            "name": "Центр — Академгородок",
+            "from_name": "Центр",
+            "to_name": "Академгородок",
+            "load_percent": 86,
+            "travel_time_min": 46,
+            "length_km": 32.4,
+            "daily_trips": 28400
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "c2",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                82.893,
+                54.982
+              ],
+              [
+                82.909,
+                54.995
+              ],
+              [
+                82.926,
+                55.006
+              ],
+              [
+                82.942,
+                55.019
+              ],
+              [
+                82.931,
+                55.03
+              ]
+            ]
+          },
+          "properties": {
+            "id": "c2",
+            "name": "Площадь Маркса — Центр",
+            "from_name": "Площадь Маркса",
+            "to_name": "Центр",
+            "load_percent": 72,
+            "travel_time_min": 24,
+            "length_km": 8.6,
+            "daily_trips": 23100
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "c3",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                82.692,
+                54.997
+              ],
+              [
+                82.744,
+                54.999
+              ],
+              [
+                82.81,
+                54.997
+              ],
+              [
+                82.857,
+                54.989
+              ],
+              [
+                82.893,
+                54.982
+              ]
+            ]
+          },
+          "properties": {
+            "id": "c3",
+            "name": "Обь — Новосибирск",
+            "from_name": "Обь",
+            "to_name": "Новосибирск",
+            "load_percent": 54,
+            "travel_time_min": 35,
+            "length_km": 22.1,
+            "daily_trips": 12600
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "c4",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                82.967,
+                55.105
+              ],
+              [
+                82.957,
+                55.082
+              ],
+              [
+                82.951,
+                55.06
+              ],
+              [
+                82.942,
+                55.043
+              ],
+              [
+                82.931,
+                55.03
+              ]
+            ]
+          },
+          "properties": {
+            "id": "c4",
+            "name": "Калининский район — Центр",
+            "from_name": "Калининский район",
+            "to_name": "Центр",
+            "load_percent": 79,
+            "travel_time_min": 28,
+            "length_km": 11.2,
+            "daily_trips": 19400
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "c5",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                83.106,
+                54.854
+              ],
+              [
+                83.12,
+                54.831
+              ],
+              [
+                83.13,
+                54.802
+              ],
+              [
+                83.111,
+                54.762
+              ]
+            ]
+          },
+          "properties": {
+            "id": "c5",
+            "name": "Академгородок — Бердск",
+            "from_name": "Академгородок",
+            "to_name": "Бердск",
+            "load_percent": 38,
+            "travel_time_min": 22,
+            "length_km": 16.8,
+            "daily_trips": 8700
+          }
+        },
+        {
+          "type": "Feature",
+          "id": "c6",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                83.181,
+                54.937
+              ],
+              [
+                83.16,
+                54.917
+              ],
+              [
+                83.13,
+                54.887
+              ],
+              [
+                83.106,
+                54.854
+              ]
+            ]
+          },
+          "properties": {
+            "id": "c6",
+            "name": "Кольцово — Академгородок",
+            "from_name": "Кольцово",
+            "to_name": "Академгородок",
+            "load_percent": 47,
+            "travel_time_min": 26,
+            "length_km": 18.3,
+            "daily_trips": 6200
+          }
+        }
+      ]
+    }
+  }
+}

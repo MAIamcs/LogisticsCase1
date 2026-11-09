@@ -1,0 +1,734 @@
+{
+  "$defs": {
+    "CriticalInterval": {
+      "additionalProperties": false,
+      "properties": {
+        "start_year": {
+          "title": "Start Year",
+          "type": "integer"
+        },
+        "end_year": {
+          "title": "End Year",
+          "type": "integer"
+        },
+        "severity": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "affected_feature_ids": {
+          "items": {
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Affected Feature Ids",
+          "type": "array"
+        },
+        "metric": {
+          "maxLength": 80,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Metric",
+          "type": "string"
+        },
+        "trigger_description": {
+          "minLength": 1,
+          "title": "Trigger Description",
+          "type": "string"
+        },
+        "recommended_action": {
+          "minLength": 1,
+          "title": "Recommended Action",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start_year",
+        "end_year",
+        "severity",
+        "affected_feature_ids",
+        "metric",
+        "trigger_description",
+        "recommended_action"
+      ],
+      "title": "CriticalInterval",
+      "type": "object"
+    },
+    "DataQualityWarning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "maxLength": 80,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warning"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "feature_ids": {
+          "items": {
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "title": "Feature Ids",
+          "type": "array"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "feature_ids",
+        "message"
+      ],
+      "title": "DataQualityWarning",
+      "type": "object"
+    },
+    "ForecastAggregates": {
+      "additionalProperties": false,
+      "properties": {
+        "aggregation": {
+          "enum": [
+            "sum",
+            "mean"
+          ],
+          "title": "Aggregation",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "feature_count": {
+          "minimum": 0,
+          "title": "Feature Count",
+          "type": "integer"
+        },
+        "baseline_observed_count": {
+          "minimum": 0,
+          "title": "Baseline Observed Count",
+          "type": "integer"
+        },
+        "forecast_observed_count": {
+          "minimum": 0,
+          "title": "Forecast Observed Count",
+          "type": "integer"
+        },
+        "paired_observed_count": {
+          "minimum": 0,
+          "title": "Paired Observed Count",
+          "type": "integer"
+        },
+        "coverage_comparable": {
+          "title": "Coverage Comparable",
+          "type": "boolean"
+        },
+        "baseline_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Baseline Value"
+        },
+        "forecast_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Forecast Value"
+        },
+        "delta_absolute": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Delta Absolute"
+        },
+        "delta_percent": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Delta Percent"
+        }
+      },
+      "required": [
+        "aggregation",
+        "unit",
+        "feature_count",
+        "baseline_observed_count",
+        "forecast_observed_count",
+        "paired_observed_count",
+        "coverage_comparable",
+        "baseline_value",
+        "forecast_value",
+        "delta_absolute",
+        "delta_percent"
+      ],
+      "title": "ForecastAggregates",
+      "type": "object"
+    },
+    "ForecastFeature": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Feature",
+          "title": "Type",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "geometry": {
+          "discriminator": {
+            "mapping": {
+              "LineString": "#/$defs/LineGeometry",
+              "MultiLineString": "#/$defs/MultiLineGeometry",
+              "MultiPolygon": "#/$defs/MultiPolygonGeometry",
+              "Point": "#/$defs/PointGeometry",
+              "Polygon": "#/$defs/PolygonGeometry"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/PolygonGeometry"
+            },
+            {
+              "$ref": "#/$defs/MultiPolygonGeometry"
+            },
+            {
+              "$ref": "#/$defs/LineGeometry"
+            },
+            {
+              "$ref": "#/$defs/MultiLineGeometry"
+            },
+            {
+              "$ref": "#/$defs/PointGeometry"
+            }
+          ],
+          "title": "Geometry"
+        },
+        "properties": {
+          "$ref": "#/$defs/ForecastProperties"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "ForecastFeature",
+      "type": "object"
+    },
+    "ForecastFeatureCollection": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "FeatureCollection",
+          "title": "Type",
+          "type": "string"
+        },
+        "features": {
+          "items": {
+            "$ref": "#/$defs/ForecastFeature"
+          },
+          "title": "Features",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "features"
+      ],
+      "title": "ForecastFeatureCollection",
+      "type": "object"
+    },
+    "ForecastProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "feature_id": {
+          "maxLength": 80,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Feature Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "pattern": "^[a-z][a-z0-9_-]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        },
+        "baseline_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Baseline Value"
+        },
+        "forecast_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Forecast Value"
+        },
+        "delta_absolute": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Delta Absolute"
+        },
+        "delta_percent": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Delta Percent"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "quality_status": {
+          "enum": [
+            "ok",
+            "missing_baseline",
+            "missing_forecast",
+            "missing_both"
+          ],
+          "title": "Quality Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "feature_id",
+        "name",
+        "baseline_value",
+        "forecast_value",
+        "delta_absolute",
+        "delta_percent",
+        "unit",
+        "quality_status"
+      ],
+      "title": "ForecastProperties",
+      "type": "object"
+    },
+    "LineGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "LineString",
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "maximum": 180,
+                "minimum": -180,
+                "type": "number"
+              },
+              {
+                "maximum": 90,
+                "minimum": -90,
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "minItems": 2,
+          "title": "Coordinates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "LineGeometry",
+      "type": "object"
+    },
+    "MultiLineGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "MultiLineString",
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            "minItems": 2,
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "MultiLineGeometry",
+      "type": "object"
+    },
+    "MultiPolygonGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "MultiPolygon",
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "items": {
+              "items": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "maximum": 180,
+                    "minimum": -180,
+                    "type": "number"
+                  },
+                  {
+                    "maximum": 90,
+                    "minimum": -90,
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "minItems": 4,
+              "type": "array"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "MultiPolygonGeometry",
+      "type": "object"
+    },
+    "PointGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Point",
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "maximum": 180,
+              "minimum": -180,
+              "type": "number"
+            },
+            {
+              "maximum": 90,
+              "minimum": -90,
+              "type": "number"
+            }
+          ],
+          "title": "Coordinates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "PointGeometry",
+      "type": "object"
+    },
+    "PolygonGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Polygon",
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            "minItems": 4,
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "PolygonGeometry",
+      "type": "object"
+    },
+    "YearComparison": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "enum": [
+            "baseline",
+            "selected"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "year": {
+          "title": "Year",
+          "type": "integer"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "observed_feature_count": {
+          "minimum": 0,
+          "title": "Observed Feature Count",
+          "type": "integer"
+        },
+        "missing_feature_ids": {
+          "items": {
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "type": "string"
+          },
+          "title": "Missing Feature Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "role",
+        "year",
+        "value",
+        "observed_feature_count",
+        "missing_feature_ids"
+      ],
+      "title": "YearComparison",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "base_year": {
+      "title": "Base Year",
+      "type": "integer"
+    },
+    "forecast_year": {
+      "title": "Forecast Year",
+      "type": "integer"
+    },
+    "metric": {
+      "maxLength": 80,
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "title": "Metric",
+      "type": "string"
+    },
+    "scenario": {
+      "maxLength": 80,
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "title": "Scenario",
+      "type": "string"
+    },
+    "model_version": {
+      "minLength": 1,
+      "title": "Model Version",
+      "type": "string"
+    },
+    "data_version": {
+      "minLength": 1,
+      "title": "Data Version",
+      "type": "string"
+    },
+    "is_demo": {
+      "title": "Is Demo",
+      "type": "boolean"
+    },
+    "disclaimer": {
+      "minLength": 1,
+      "title": "Disclaimer",
+      "type": "string"
+    },
+    "geojson": {
+      "$ref": "#/$defs/ForecastFeatureCollection"
+    },
+    "aggregates": {
+      "$ref": "#/$defs/ForecastAggregates"
+    },
+    "comparison": {
+      "items": {
+        "$ref": "#/$defs/YearComparison"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "title": "Comparison",
+      "type": "array"
+    },
+    "critical_intervals": {
+      "items": {
+        "$ref": "#/$defs/CriticalInterval"
+      },
+      "title": "Critical Intervals",
+      "type": "array"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/DataQualityWarning"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "base_year",
+    "forecast_year",
+    "metric",
+    "scenario",
+    "model_version",
+    "data_version",
+    "is_demo",
+    "disclaimer",
+    "geojson",
+    "aggregates",
+    "comparison",
+    "critical_intervals",
+    "warnings"
+  ],
+  "title": "ForecastResponse",
+  "type": "object"
+}

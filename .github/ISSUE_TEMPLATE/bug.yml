@@ -1,0 +1,61 @@
+name: Ошибка
+description: Ошибка карты, данных, интерфейса или API
+title: "[Ошибка] "
+body:
+  - type: markdown
+    attributes:
+      value: Не включайте токены, содержимое .env.local или личные данные в описание и логи.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Где возникла ошибка?
+      options:
+        - Frontend — карта / графики / управление
+        - Backend — API / валидация
+        - Контракт / аналитическая модель
+        - Геоданные / источники
+        - Сборка / GitHub Pages
+    validations:
+      required: true
+  - type: dropdown
+    id: data_mode
+    attributes:
+      label: Режим данных
+      options:
+        - demo
+        - api
+        - Не относится к режиму данных
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Как воспроизвести?
+      description: Укажите последовательность действий, год, показатель, сценарий и объект; для API — маршрут и параметры без секретов.
+      placeholder: |
+        1. Открыть ...
+        2. Выбрать ...
+        3. Получить ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: Ожидаемый и фактический результат
+      placeholder: |
+        Ожидалось:
+        Получено:
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Версия и окружение
+      description: Commit или URL сборки, браузер, размер экрана; для backend — версия Python. Для данных полезны data_version и geography_version.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Снимки и сообщения об ошибке
+      description: Приложите только относящиеся к ошибке материалы; удалите секреты и личные данные.

@@ -1,0 +1,46 @@
+name: Задача
+description: Предложить конкретную доработку framework
+title: "[Задача] "
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Цель и итоговое поведение
+      description: Какую задачу пользователя решаем? Что должно измениться?
+    validations:
+      required: true
+  - type: dropdown
+    id: ownership
+    attributes:
+      label: Границы ответственности
+      multiple: true
+      options:
+        - Frontend
+        - Backend
+        - Аналитическая модель / контракт
+        - Геоданные
+        - Интеграция / CI / документация
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Критерии готовности
+      description: Наблюдаемый результат и способ его проверки; при изменении UI учтите desktop/mobile и клавиатуру.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: contract
+    attributes:
+      label: Влияние на контракт, модель и данные
+      description: Новые поля/единицы/источники, совместимость, версии и миграция. Если влияния нет, укажите это.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Ограничения и зависимости
+      description: Связанные задачи, доступность исходных данных или сервиса. Не включайте секреты.

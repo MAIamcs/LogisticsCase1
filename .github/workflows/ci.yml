@@ -1,0 +1,76 @@
+name: Framework checks
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.lock
+      - run: python -m pip install -r backend/requirements-dev.lock
+      - run: python scripts/import_geography.py
+      - run: git diff --exit-code -- contracts/geography
+      - run: python scripts/export_contract.py --check
+      - run: python scripts/check_secrets.py
+      - run: python scripts/create_forecast_fixtures.py --check
+      - run: python scripts/import_geography.py --check
+      - name: Validate every static response and GeoJSON against API schemas
+        run: python scripts/validate_fixtures.py
+      - run: python -m pytest backend/tests -q
+
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        data-mode: [demo, api]
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      VITE_DATA_MODE: ${{ matrix.data-mode }}
+      VITE_API_BASE_URL: https://api.example.test
+      VITE_BASE_PATH: /LogisticsCase1/
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm types:check
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - name: Verify Pages paths, static data parity and refresh over HTTP
+        run: pnpm check:build --serve

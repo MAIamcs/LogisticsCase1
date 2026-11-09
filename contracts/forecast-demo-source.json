@@ -1,0 +1,389 @@
+{
+  "base_year": 2026,
+  "available_years": [
+    2026,
+    2027,
+    2028,
+    2029,
+    2030
+  ],
+  "data_version": "synthetic-nsk-2026.1",
+  "model_version": "demo-linear-v3",
+  "disclaimer": "Географические объекты взяты из указанных картографических источников. Численные показатели и критические интервалы — синтетическая демонстрация, не фактическая статистика и не аналитический прогноз. Аналитическая модель не подключена.",
+  "metrics": [
+    {
+      "id": "population",
+      "name": "Население",
+      "unit": "persons",
+      "description": "Демонстрационная численность населения десяти районов Новосибирска. Значения синтетические; сумма по районам, не официальная статистика.",
+      "aggregation": "sum",
+      "semantic_type": "population",
+      "geometry_types": [
+        "Polygon",
+        "MultiPolygon"
+      ]
+    },
+    {
+      "id": "transport_demand",
+      "name": "Спрос на поездки",
+      "unit": "trips/day",
+      "description": "Условное число поездок в сутки на транспортных участках. Это не пассажиропоток, не пропускная способность и не интенсивность движения. Итог — сумма известных значений.",
+      "aggregation": "sum",
+      "semantic_type": "trip_demand",
+      "geometry_types": [
+        "LineString",
+        "MultiLineString"
+      ]
+    },
+    {
+      "id": "infrastructure_load",
+      "name": "Загрузка инфраструктуры",
+      "unit": "%",
+      "description": "Условное отношение нагрузки к пропускной способности участка, в процентах. Итог — невзвешенное среднее, а не сумма процентов. Это не пассажиропоток и не интенсивность движения; 100% не задаёт объём замены инфраструктуры.",
+      "aggregation": "mean",
+      "semantic_type": "transport_load",
+      "geometry_types": [
+        "LineString",
+        "MultiLineString"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "baseline",
+      "name": "Базовый",
+      "description": "Условная линейная траектория для проверки интерфейса и контракта данных.",
+      "rate_factor": 1.0
+    },
+    {
+      "id": "compact",
+      "name": "Компактное развитие",
+      "description": "Альтернативная условная траектория с теми же наблюдениями базового года.",
+      "rate_factor": 0.7
+    }
+  ],
+  "features": [
+    {
+      "feature_id": "district-dzerzhinsky",
+      "name": "Дзержинский район",
+      "geometry_id": "district-dzerzhinsky",
+      "anchor_values": {
+        "population": 170000
+      },
+      "annual_changes": {
+        "population": 1200
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "district-kalininsky",
+      "name": "Калининский район",
+      "geometry_id": "district-kalininsky",
+      "anchor_values": {
+        "population": 210000
+      },
+      "annual_changes": {
+        "population": 1800
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "district-kirovsky",
+      "name": "Кировский район",
+      "geometry_id": "district-kirovsky",
+      "anchor_values": {
+        "population": 200000
+      },
+      "annual_changes": {
+        "population": 900
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "district-leninsky",
+      "name": "Ленинский район",
+      "geometry_id": "district-leninsky",
+      "anchor_values": {
+        "population": 315000
+      },
+      "annual_changes": {
+        "population": 1100
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "district-oktyabrsky",
+      "name": "Октябрьский район",
+      "geometry_id": "district-oktyabrsky",
+      "anchor_values": {
+        "population": 230000
+      },
+      "annual_changes": {
+        "population": 1600
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "district-pervomaysky",
+      "name": "Первомайский район",
+      "geometry_id": "district-pervomaysky",
+      "anchor_values": {
+        "population": 85000
+      },
+      "annual_changes": {
+        "population": -300
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "district-sovetsky",
+      "name": "Советский район",
+      "geometry_id": "district-sovetsky",
+      "anchor_values": {
+        "population": 140000
+      },
+      "annual_changes": {
+        "population": 700
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "district-tsentralny",
+      "name": "Центральный район",
+      "geometry_id": "district-tsentralny",
+      "anchor_values": {
+        "population": 80000
+      },
+      "annual_changes": {
+        "population": -200
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "district-zaeltsovsky",
+      "name": "Заельцовский район",
+      "geometry_id": "district-zaeltsovsky",
+      "anchor_values": {
+        "population": 145000
+      },
+      "annual_changes": {
+        "population": 500
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "district-zheleznodorozhny",
+      "name": "Железнодорожный район",
+      "geometry_id": "district-zheleznodorozhny",
+      "anchor_values": {
+        "population": 80000
+      },
+      "annual_changes": {
+        "population": -150
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "osm-way-80223228",
+      "name": "Красный проспект",
+      "geometry_id": "osm-way-80223228",
+      "anchor_values": {
+        "transport_demand": 60000,
+        "infrastructure_load": 100
+      },
+      "annual_changes": {
+        "transport_demand": 1500,
+        "infrastructure_load": 1.8
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "osm-way-27495156",
+      "name": "улица Кирова",
+      "geometry_id": "osm-way-27495156",
+      "anchor_values": {
+        "transport_demand": 24000,
+        "infrastructure_load": 65
+      },
+      "annual_changes": {
+        "transport_demand": 320,
+        "infrastructure_load": -0.8
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "osm-way-1020600225",
+      "name": "улица Титова",
+      "geometry_id": "osm-way-1020600225",
+      "anchor_values": {
+        "transport_demand": 45000,
+        "infrastructure_load": 72
+      },
+      "annual_changes": {
+        "transport_demand": 600,
+        "infrastructure_load": 1.2
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "osm-way-93057745",
+      "name": "Бердское шоссе",
+      "geometry_id": "osm-way-93057745",
+      "anchor_values": {
+        "transport_demand": 15000,
+        "infrastructure_load": 54
+      },
+      "annual_changes": {
+        "transport_demand": -110,
+        "infrastructure_load": -0.3
+      },
+      "missing_years": {}
+    },
+    {
+      "feature_id": "osm-way-51272618",
+      "name": "проспект Академика Лаврентьева",
+      "geometry_id": "osm-way-51272618",
+      "anchor_values": {
+        "transport_demand": 22000,
+        "infrastructure_load": 85
+      },
+      "annual_changes": {
+        "transport_demand": 460,
+        "infrastructure_load": 0.5
+      },
+      "missing_years": {}
+    }
+  ],
+  "critical_intervals": [
+    {
+      "start_year": 2028,
+      "end_year": 2029,
+      "severity": "medium",
+      "affected_feature_ids": [
+        "district-pervomaysky",
+        "district-tsentralny"
+      ],
+      "metric": "population",
+      "scenario": "baseline",
+      "trigger_description": "Демонстрационный интервал поставщика для проверки отображения районной динамики. Не вычислен интерфейсом и не является выводом реальной модели.",
+      "recommended_action": "После подключения модели проверить исходные районные данные и обоснование интервала; демонстрационный период не использовать для плановых решений."
+    },
+    {
+      "start_year": 2029,
+      "end_year": 2030,
+      "severity": "low",
+      "affected_feature_ids": [
+        "district-leninsky"
+      ],
+      "metric": "population",
+      "scenario": "compact",
+      "trigger_description": "Синтетический календарный интервал сценария компактного развития, переданный демонстрационным поставщиком.",
+      "recommended_action": "Сопоставить сценарии после интеграции аналитического поставщика."
+    },
+    {
+      "start_year": 2028,
+      "end_year": 2030,
+      "severity": "high",
+      "affected_feature_ids": [
+        "osm-way-80223228"
+      ],
+      "metric": "transport_demand",
+      "scenario": "baseline",
+      "trigger_description": "Синтетический интервал проверки спроса на поездки на реальном картографическом участке. Это не фактический пассажиропоток.",
+      "recommended_action": "После интеграции модели проверить данные о поездках и пропускной способности раздельно."
+    },
+    {
+      "start_year": 2029,
+      "end_year": 2030,
+      "severity": "medium",
+      "affected_feature_ids": [
+        "osm-way-27495156"
+      ],
+      "metric": "infrastructure_load",
+      "scenario": "baseline",
+      "trigger_description": "Проверочный интервал передан демонстрационным поставщиком независимо от цветовой шкалы и значения загрузки.",
+      "recommended_action": "Не определять долю замены по проценту загрузки; использовать инженерное обоснование реальной модели."
+    }
+  ],
+  "geography_assets": [
+    "districts.geojson",
+    "roads.geojson"
+  ],
+  "reference_points_asset": "stops.geojson",
+  "geography": {
+    "description": "Десять районов Новосибирска по слою региональной государственной ГИС; дороги, здания, водные объекты и станции — OpenStreetMap. Геометрия не восстановлена по растровому примеру. Статистические значения отдельно помечены как демонстрационные.",
+    "geography_version": "nsk-geography-2026-11-09",
+    "is_synthetic": false,
+    "sources": [
+      {
+        "id": "nso-boundary",
+        "name": "Геопортал Новосибирской области — Границы районов г. Новосибирск",
+        "url": "https://maps.nso.ru/arcgis2/rest/services/Common/Boundary/MapServer/7",
+        "license": "Условия повторного использования не опубликованы в метаданных слоя",
+        "license_url": "https://maps.nso.ru/arcgis2/rest/services/Common/Boundary/MapServer/7",
+        "attribution": "Геопортал Новосибирской области",
+        "retrieved_at": "2026-11-09"
+      },
+      {
+        "id": "osm",
+        "name": "OpenStreetMap contributors; региональный extract OsmAnd",
+        "url": "https://builder.osmand.net/osm-extract/russia_novosibirsk_asia/russia_novosibirsk_asia.pbf",
+        "license": "ODbL-1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "attribution": "© OpenStreetMap contributors",
+        "retrieved_at": "2026-11-09"
+      }
+    ],
+    "layers": [
+      {
+        "id": "roads",
+        "name": "Дороги",
+        "source_id": "osm",
+        "geometry_types": [
+          "LineString",
+          "MultiLineString"
+        ],
+        "feature_count": 35048,
+        "description": "Автомобильные дороги OpenStreetMap; класс дороги передан в kind.",
+        "asset_path": "geography/roads.geojson"
+      },
+      {
+        "id": "buildings",
+        "name": "Здания",
+        "source_id": "osm",
+        "geometry_types": [
+          "Polygon",
+          "MultiPolygon"
+        ],
+        "feature_count": 115685,
+        "description": "Контуры зданий OpenStreetMap во всём охвате города; не кадастровые сведения.",
+        "asset_path": "geography/buildings.geojson"
+      },
+      {
+        "id": "water",
+        "name": "Реки и водоёмы",
+        "source_id": "osm",
+        "geometry_types": [
+          "Polygon",
+          "MultiPolygon",
+          "LineString",
+          "MultiLineString"
+        ],
+        "feature_count": 1056,
+        "description": "Реки, ручьи, каналы, водоёмы OpenStreetMap; обрезаны по охвату фоновых слоёв.",
+        "asset_path": "geography/water.geojson"
+      },
+      {
+        "id": "stops",
+        "name": "Станции",
+        "source_id": "osm",
+        "geometry_types": [
+          "Point"
+        ],
+        "feature_count": 56,
+        "description": "Имеющиеся в OpenStreetMap железнодорожные станции и станции метро; не полный реестр остановок.",
+        "asset_path": "geography/stops.geojson"
+      }
+    ]
+  }
+}

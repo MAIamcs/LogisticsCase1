@@ -1,0 +1,43 @@
+{
+  "name": "novosibirsk-transport-planner",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "predev": "node ../scripts/sync-demo.mjs",
+    "dev": "vite --host 127.0.0.1",
+    "prebuild": "node ../scripts/sync-demo.mjs",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run",
+    "types:generate": "openapi-typescript ../contracts/openapi.json -o ../contracts/api.generated.ts",
+    "typecheck": "tsc -b",
+    "types:check": "node ../scripts/check_api_types.mjs",
+    "check:build": "node ../scripts/check_static_build.mjs",
+    "pretest": "node ../scripts/sync-demo.mjs",
+    "prepare:data": "node ../scripts/sync-demo.mjs"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "lucide-react": "^0.468.0",
+    "maplibre-gl": "^5.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "openapi-typescript": "^7.6.1",
+    "typescript": "~5.9.3",
+    "vite": "^7.0.0",
+    "vitest": "^3.2.0"
+  }
+}

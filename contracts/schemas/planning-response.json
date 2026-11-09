@@ -1,0 +1,277 @@
+{
+  "$defs": {
+    "CorridorCollection": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "FeatureCollection",
+          "title": "Type",
+          "type": "string"
+        },
+        "features": {
+          "items": {
+            "$ref": "#/$defs/CorridorFeature"
+          },
+          "title": "Features",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "features"
+      ],
+      "title": "CorridorCollection",
+      "type": "object"
+    },
+    "CorridorFeature": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Feature",
+          "title": "Type",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "geometry": {
+          "$ref": "#/$defs/LineGeometry"
+        },
+        "properties": {
+          "$ref": "#/$defs/CorridorProperties"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "CorridorFeature",
+      "type": "object"
+    },
+    "CorridorProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "from_name": {
+          "title": "From Name",
+          "type": "string"
+        },
+        "to_name": {
+          "title": "To Name",
+          "type": "string"
+        },
+        "load_percent": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Load Percent",
+          "type": "number"
+        },
+        "travel_time_min": {
+          "exclusiveMinimum": 0,
+          "title": "Travel Time Min",
+          "type": "number"
+        },
+        "length_km": {
+          "exclusiveMinimum": 0,
+          "title": "Length Km",
+          "type": "number"
+        },
+        "daily_trips": {
+          "minimum": 0,
+          "title": "Daily Trips",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "from_name",
+        "to_name",
+        "load_percent",
+        "travel_time_min",
+        "length_km",
+        "daily_trips"
+      ],
+      "title": "CorridorProperties",
+      "type": "object"
+    },
+    "LineGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "LineString",
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "maximum": 180,
+                "minimum": -180,
+                "type": "number"
+              },
+              {
+                "maximum": 90,
+                "minimum": -90,
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "minItems": 2,
+          "title": "Coordinates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "LineGeometry",
+      "type": "object"
+    },
+    "Metadata": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "synthetic",
+            "model"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "is_synthetic": {
+          "title": "Is Synthetic",
+          "type": "boolean"
+        },
+        "disclaimer": {
+          "minLength": 1,
+          "title": "Disclaimer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "source",
+        "is_synthetic",
+        "disclaimer"
+      ],
+      "title": "Metadata",
+      "type": "object"
+    },
+    "PlanningData": {
+      "additionalProperties": false,
+      "properties": {
+        "scenario": {
+          "$ref": "#/$defs/Scenario"
+        },
+        "summary": {
+          "$ref": "#/$defs/Summary"
+        },
+        "corridors": {
+          "$ref": "#/$defs/CorridorCollection"
+        }
+      },
+      "required": [
+        "scenario",
+        "summary",
+        "corridors"
+      ],
+      "title": "PlanningData",
+      "type": "object"
+    },
+    "Scenario": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z0-9-]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "period": {
+          "title": "Period",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "period"
+      ],
+      "title": "Scenario",
+      "type": "object"
+    },
+    "Summary": {
+      "additionalProperties": false,
+      "properties": {
+        "daily_trips": {
+          "minimum": 0,
+          "title": "Daily Trips",
+          "type": "integer"
+        },
+        "mean_travel_time_min": {
+          "minimum": 0,
+          "title": "Mean Travel Time Min",
+          "type": "number"
+        },
+        "mean_load_percent": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Mean Load Percent",
+          "type": "number"
+        }
+      },
+      "required": [
+        "daily_trips",
+        "mean_travel_time_min",
+        "mean_load_percent"
+      ],
+      "title": "Summary",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "$ref": "#/$defs/Metadata"
+    },
+    "data": {
+      "$ref": "#/$defs/PlanningData"
+    }
+  },
+  "required": [
+    "meta",
+    "data"
+  ],
+  "title": "PlanningResponse",
+  "type": "object"
+}

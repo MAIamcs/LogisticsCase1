@@ -1,0 +1,2121 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Novosibirsk Transport Planning API",
+    "description": "Provider-independent forecast and real geography API. Statistical values from the default provider remain synthetic demonstrations, not a real forecast.",
+    "version": "0.4.0"
+  },
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/metadata": {
+      "get": {
+        "summary": "Metadata",
+        "operationId": "metadata_api_v1_metadata_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForecastMetadataResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/geography": {
+      "get": {
+        "summary": "Geography",
+        "description": "Real boundaries, layer descriptors, provenance and geography version.",
+        "operationId": "geography_api_v1_geography_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Geography"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/geography/layers/{layer_id}": {
+      "get": {
+        "summary": "Geographic Layer",
+        "operationId": "geographic_layer_api_v1_geography_layers__layer_id__get",
+        "parameters": [
+          {
+            "name": "layer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 80,
+              "pattern": "^[a-z][a-z0-9_-]*$",
+              "title": "Layer Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeographyLayerCollection"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/forecast": {
+      "get": {
+        "summary": "Forecast",
+        "operationId": "forecast_api_v1_forecast_get",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Year"
+            }
+          },
+          {
+            "name": "metric",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 80,
+              "pattern": "^[a-z][a-z0-9_-]*$",
+              "title": "Metric"
+            }
+          },
+          {
+            "name": "scenario",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 80,
+              "pattern": "^[a-z][a-z0-9_-]*$",
+              "title": "Scenario"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForecastResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/scenarios": {
+      "get": {
+        "summary": "Scenarios",
+        "operationId": "scenarios_api_v1_scenarios_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/scenarios/{scenario_id}": {
+      "get": {
+        "summary": "Scenario",
+        "operationId": "scenario_api_v1_scenarios__scenario_id__get",
+        "parameters": [
+          {
+            "name": "scenario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 80,
+              "pattern": "^[a-z0-9-]+$",
+              "title": "Scenario Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BoundaryCollection": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "FeatureCollection",
+            "title": "Type"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/BoundaryFeature"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Features"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "features"
+        ],
+        "title": "BoundaryCollection"
+      },
+      "BoundaryFeature": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "Feature",
+            "title": "Type"
+          },
+          "id": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "title": "Id"
+          },
+          "geometry": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PolygonGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/MultiPolygonGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/LineGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/MultiLineGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/PointGeometry"
+              }
+            ],
+            "title": "Geometry",
+            "discriminator": {
+              "propertyName": "type",
+              "mapping": {
+                "LineString": "#/components/schemas/LineGeometry",
+                "MultiLineString": "#/components/schemas/MultiLineGeometry",
+                "MultiPolygon": "#/components/schemas/MultiPolygonGeometry",
+                "Point": "#/components/schemas/PointGeometry",
+                "Polygon": "#/components/schemas/PolygonGeometry"
+              }
+            }
+          },
+          "properties": {
+            "$ref": "#/components/schemas/BoundaryProperties"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "id",
+          "geometry",
+          "properties"
+        ],
+        "title": "BoundaryFeature"
+      },
+      "BoundaryProperties": {
+        "properties": {
+          "feature_id": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "title": "Feature Id"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80,
+                "pattern": "^[a-z][a-z0-9_-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "feature_id",
+          "name"
+        ],
+        "title": "BoundaryProperties"
+      },
+      "CorridorCollection": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "FeatureCollection",
+            "title": "Type"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/CorridorFeature"
+            },
+            "type": "array",
+            "title": "Features"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "features"
+        ],
+        "title": "CorridorCollection"
+      },
+      "CorridorFeature": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "Feature",
+            "title": "Type"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "geometry": {
+            "$ref": "#/components/schemas/LineGeometry"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/CorridorProperties"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "id",
+          "geometry",
+          "properties"
+        ],
+        "title": "CorridorFeature"
+      },
+      "CorridorProperties": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "from_name": {
+            "type": "string",
+            "title": "From Name"
+          },
+          "to_name": {
+            "type": "string",
+            "title": "To Name"
+          },
+          "load_percent": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Load Percent"
+          },
+          "travel_time_min": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Travel Time Min"
+          },
+          "length_km": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Length Km"
+          },
+          "daily_trips": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Daily Trips"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "from_name",
+          "to_name",
+          "load_percent",
+          "travel_time_min",
+          "length_km",
+          "daily_trips"
+        ],
+        "title": "CorridorProperties"
+      },
+      "CriticalInterval": {
+        "properties": {
+          "start_year": {
+            "type": "integer",
+            "title": "Start Year"
+          },
+          "end_year": {
+            "type": "integer",
+            "title": "End Year"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ],
+            "title": "Severity"
+          },
+          "affected_feature_ids": {
+            "items": {
+              "type": "string",
+              "maxLength": 80,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Affected Feature Ids"
+          },
+          "metric": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "title": "Metric"
+          },
+          "trigger_description": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Trigger Description"
+          },
+          "recommended_action": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Recommended Action"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "start_year",
+          "end_year",
+          "severity",
+          "affected_feature_ids",
+          "metric",
+          "trigger_description",
+          "recommended_action"
+        ],
+        "title": "CriticalInterval"
+      },
+      "DataQualityWarning": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "title": "Code"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warning"
+            ],
+            "title": "Severity"
+          },
+          "feature_ids": {
+            "items": {
+              "type": "string",
+              "maxLength": 80,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": "array",
+            "title": "Feature Ids"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Message"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "severity",
+          "feature_ids",
+          "message"
+        ],
+        "title": "DataQualityWarning"
+      },
+      "ErrorDetail": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "not_found",
+              "validation_error",
+              "service_unavailable",
+              "internal_error"
+            ],
+            "title": "Code"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ValidationIssue"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorDetail"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse"
+      },
+      "ForecastAggregates": {
+        "properties": {
+          "aggregation": {
+            "type": "string",
+            "enum": [
+              "sum",
+              "mean"
+            ],
+            "title": "Aggregation"
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Unit"
+          },
+          "feature_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Feature Count"
+          },
+          "baseline_observed_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Baseline Observed Count"
+          },
+          "forecast_observed_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Forecast Observed Count"
+          },
+          "paired_observed_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Paired Observed Count"
+          },
+          "coverage_comparable": {
+            "type": "boolean",
+            "title": "Coverage Comparable"
+          },
+          "baseline_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline Value"
+          },
+          "forecast_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast Value"
+          },
+          "delta_absolute": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delta Absolute"
+          },
+          "delta_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delta Percent"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "aggregation",
+          "unit",
+          "feature_count",
+          "baseline_observed_count",
+          "forecast_observed_count",
+          "paired_observed_count",
+          "coverage_comparable",
+          "baseline_value",
+          "forecast_value",
+          "delta_absolute",
+          "delta_percent"
+        ],
+        "title": "ForecastAggregates"
+      },
+      "ForecastFeature": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "Feature",
+            "title": "Type"
+          },
+          "id": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "title": "Id"
+          },
+          "geometry": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PolygonGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/MultiPolygonGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/LineGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/MultiLineGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/PointGeometry"
+              }
+            ],
+            "title": "Geometry",
+            "discriminator": {
+              "propertyName": "type",
+              "mapping": {
+                "LineString": "#/components/schemas/LineGeometry",
+                "MultiLineString": "#/components/schemas/MultiLineGeometry",
+                "MultiPolygon": "#/components/schemas/MultiPolygonGeometry",
+                "Point": "#/components/schemas/PointGeometry",
+                "Polygon": "#/components/schemas/PolygonGeometry"
+              }
+            }
+          },
+          "properties": {
+            "$ref": "#/components/schemas/ForecastProperties"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "id",
+          "geometry",
+          "properties"
+        ],
+        "title": "ForecastFeature"
+      },
+      "ForecastFeatureCollection": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "FeatureCollection",
+            "title": "Type"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastFeature"
+            },
+            "type": "array",
+            "title": "Features"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "features"
+        ],
+        "title": "ForecastFeatureCollection"
+      },
+      "ForecastMetadataResponse": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1.2",
+            "title": "Schema Version"
+          },
+          "base_year": {
+            "type": "integer",
+            "title": "Base Year"
+          },
+          "available_years": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Available Years"
+          },
+          "metrics": {
+            "items": {
+              "$ref": "#/components/schemas/MetricDefinition"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Metrics"
+          },
+          "scenarios": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastScenario"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Scenarios"
+          },
+          "geography": {
+            "$ref": "#/components/schemas/Geography"
+          },
+          "data_version": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Data Version"
+          },
+          "is_demo": {
+            "type": "boolean",
+            "title": "Is Demo"
+          },
+          "disclaimer": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Disclaimer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schema_version",
+          "base_year",
+          "available_years",
+          "metrics",
+          "scenarios",
+          "geography",
+          "data_version",
+          "is_demo",
+          "disclaimer"
+        ],
+        "title": "ForecastMetadataResponse"
+      },
+      "ForecastProperties": {
+        "properties": {
+          "feature_id": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "title": "Feature Id"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80,
+                "pattern": "^[a-z][a-z0-9_-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          },
+          "baseline_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline Value"
+          },
+          "forecast_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast Value"
+          },
+          "delta_absolute": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delta Absolute"
+          },
+          "delta_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delta Percent"
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Unit"
+          },
+          "quality_status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "missing_baseline",
+              "missing_forecast",
+              "missing_both"
+            ],
+            "title": "Quality Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "feature_id",
+          "name",
+          "baseline_value",
+          "forecast_value",
+          "delta_absolute",
+          "delta_percent",
+          "unit",
+          "quality_status"
+        ],
+        "title": "ForecastProperties"
+      },
+      "ForecastResponse": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1.2",
+            "title": "Schema Version"
+          },
+          "base_year": {
+            "type": "integer",
+            "title": "Base Year"
+          },
+          "forecast_year": {
+            "type": "integer",
+            "title": "Forecast Year"
+          },
+          "metric": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "title": "Metric"
+          },
+          "scenario": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "title": "Scenario"
+          },
+          "model_version": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Model Version"
+          },
+          "data_version": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Data Version"
+          },
+          "is_demo": {
+            "type": "boolean",
+            "title": "Is Demo"
+          },
+          "disclaimer": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Disclaimer"
+          },
+          "geojson": {
+            "$ref": "#/components/schemas/ForecastFeatureCollection"
+          },
+          "aggregates": {
+            "$ref": "#/components/schemas/ForecastAggregates"
+          },
+          "comparison": {
+            "items": {
+              "$ref": "#/components/schemas/YearComparison"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Comparison"
+          },
+          "critical_intervals": {
+            "items": {
+              "$ref": "#/components/schemas/CriticalInterval"
+            },
+            "type": "array",
+            "title": "Critical Intervals"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/DataQualityWarning"
+            },
+            "type": "array",
+            "title": "Warnings"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schema_version",
+          "base_year",
+          "forecast_year",
+          "metric",
+          "scenario",
+          "model_version",
+          "data_version",
+          "is_demo",
+          "disclaimer",
+          "geojson",
+          "aggregates",
+          "comparison",
+          "critical_intervals",
+          "warnings"
+        ],
+        "title": "ForecastResponse"
+      },
+      "ForecastScenario": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Description"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description"
+        ],
+        "title": "ForecastScenario"
+      },
+      "Geography": {
+        "properties": {
+          "crs": {
+            "type": "string",
+            "const": "EPSG:4326",
+            "title": "Crs"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Description"
+          },
+          "bbox": {
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array",
+            "maxItems": 4,
+            "minItems": 4,
+            "title": "Bbox"
+          },
+          "boundaries": {
+            "$ref": "#/components/schemas/BoundaryCollection"
+          },
+          "reference_points": {
+            "$ref": "#/components/schemas/ReferencePoints"
+          },
+          "geography_version": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Geography Version",
+            "default": "unspecified"
+          },
+          "is_synthetic": {
+            "type": "boolean",
+            "title": "Is Synthetic",
+            "default": false
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/GeographySource"
+            },
+            "type": "array",
+            "title": "Sources"
+          },
+          "layers": {
+            "items": {
+              "$ref": "#/components/schemas/GeographyLayer"
+            },
+            "type": "array",
+            "title": "Layers"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "crs",
+          "description",
+          "bbox",
+          "boundaries"
+        ],
+        "title": "Geography"
+      },
+      "GeographyLayer": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "geometry_types": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "Polygon",
+                "MultiPolygon",
+                "LineString",
+                "MultiLineString",
+                "Point"
+              ]
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Geometry Types"
+          },
+          "source_id": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "title": "Source Id"
+          },
+          "asset_path": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Asset Path"
+          },
+          "feature_count": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feature Count"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "geometry_types",
+          "source_id",
+          "asset_path"
+        ],
+        "title": "GeographyLayer"
+      },
+      "GeographyLayerCollection": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "FeatureCollection",
+            "title": "Type"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/GeographyLayerFeature"
+            },
+            "type": "array",
+            "title": "Features"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "features"
+        ],
+        "title": "GeographyLayerCollection"
+      },
+      "GeographyLayerFeature": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "Feature",
+            "title": "Type"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "geometry": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PolygonGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/MultiPolygonGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/LineGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/MultiLineGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/PointGeometry"
+              }
+            ],
+            "title": "Geometry",
+            "discriminator": {
+              "propertyName": "type",
+              "mapping": {
+                "LineString": "#/components/schemas/LineGeometry",
+                "MultiLineString": "#/components/schemas/MultiLineGeometry",
+                "MultiPolygon": "#/components/schemas/MultiPolygonGeometry",
+                "Point": "#/components/schemas/PointGeometry",
+                "Polygon": "#/components/schemas/PolygonGeometry"
+              }
+            }
+          },
+          "properties": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Properties"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "geometry",
+          "properties"
+        ],
+        "title": "GeographyLayerFeature"
+      },
+      "GeographySource": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Url"
+          },
+          "attribution": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Attribution"
+          },
+          "license": {
+            "type": "string",
+            "minLength": 1,
+            "title": "License"
+          },
+          "license_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "License Url"
+          },
+          "retrieved_at": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Retrieved At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "url",
+          "attribution",
+          "license",
+          "retrieved_at"
+        ],
+        "title": "GeographySource"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status",
+            "default": "ok"
+          },
+          "service": {
+            "type": "string",
+            "const": "transport-planning-api",
+            "title": "Service",
+            "default": "transport-planning-api"
+          },
+          "model_status": {
+            "type": "string",
+            "enum": [
+              "not_integrated",
+              "provider_configured"
+            ],
+            "title": "Model Status",
+            "default": "not_integrated"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "HealthResponse"
+      },
+      "LineGeometry": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "LineString",
+            "title": "Type"
+          },
+          "coordinates": {
+            "items": {
+              "prefixItems": [
+                {
+                  "type": "number",
+                  "maximum": 180.0,
+                  "minimum": -180.0
+                },
+                {
+                  "type": "number",
+                  "maximum": 90.0,
+                  "minimum": -90.0
+                }
+              ],
+              "type": "array",
+              "maxItems": 2,
+              "minItems": 2
+            },
+            "type": "array",
+            "minItems": 2,
+            "title": "Coordinates"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "title": "LineGeometry"
+      },
+      "Metadata": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1.0",
+            "title": "Schema Version"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "synthetic",
+              "model"
+            ],
+            "title": "Source"
+          },
+          "is_synthetic": {
+            "type": "boolean",
+            "title": "Is Synthetic"
+          },
+          "disclaimer": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Disclaimer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schema_version",
+          "source",
+          "is_synthetic",
+          "disclaimer"
+        ],
+        "title": "Metadata"
+      },
+      "MetricDefinition": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Unit"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Description"
+          },
+          "aggregation": {
+            "type": "string",
+            "enum": [
+              "sum",
+              "mean"
+            ],
+            "title": "Aggregation"
+          },
+          "semantic_type": {
+            "type": "string",
+            "enum": [
+              "population",
+              "transport_load",
+              "trip_demand",
+              "passenger_flow",
+              "transport_capacity",
+              "traffic_intensity",
+              "other"
+            ],
+            "title": "Semantic Type"
+          },
+          "geometry_types": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "Polygon",
+                "MultiPolygon",
+                "LineString",
+                "MultiLineString",
+                "Point"
+              ]
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Geometry Types"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "unit",
+          "description",
+          "aggregation",
+          "semantic_type",
+          "geometry_types"
+        ],
+        "title": "MetricDefinition"
+      },
+      "MultiLineGeometry": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "MultiLineString",
+            "title": "Type"
+          },
+          "coordinates": {
+            "items": {
+              "items": {
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "maximum": 180.0,
+                    "minimum": -180.0
+                  },
+                  {
+                    "type": "number",
+                    "maximum": 90.0,
+                    "minimum": -90.0
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              "type": "array",
+              "minItems": 2
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Coordinates"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "title": "MultiLineGeometry"
+      },
+      "MultiPolygonGeometry": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "MultiPolygon",
+            "title": "Type"
+          },
+          "coordinates": {
+            "items": {
+              "items": {
+                "items": {
+                  "prefixItems": [
+                    {
+                      "type": "number",
+                      "maximum": 180.0,
+                      "minimum": -180.0
+                    },
+                    {
+                      "type": "number",
+                      "maximum": 90.0,
+                      "minimum": -90.0
+                    }
+                  ],
+                  "type": "array",
+                  "maxItems": 2,
+                  "minItems": 2
+                },
+                "type": "array",
+                "minItems": 4
+              },
+              "type": "array",
+              "minItems": 1
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Coordinates"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "title": "MultiPolygonGeometry"
+      },
+      "PlanningData": {
+        "properties": {
+          "scenario": {
+            "$ref": "#/components/schemas/Scenario"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/Summary"
+          },
+          "corridors": {
+            "$ref": "#/components/schemas/CorridorCollection"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scenario",
+          "summary",
+          "corridors"
+        ],
+        "title": "PlanningData"
+      },
+      "PlanningResponse": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PlanningData"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "meta",
+          "data"
+        ],
+        "title": "PlanningResponse"
+      },
+      "PointGeometry": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "Point",
+            "title": "Type"
+          },
+          "coordinates": {
+            "prefixItems": [
+              {
+                "type": "number",
+                "maximum": 180.0,
+                "minimum": -180.0
+              },
+              {
+                "type": "number",
+                "maximum": 90.0,
+                "minimum": -90.0
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Coordinates"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "title": "PointGeometry"
+      },
+      "PolygonGeometry": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "Polygon",
+            "title": "Type"
+          },
+          "coordinates": {
+            "items": {
+              "items": {
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "maximum": 180.0,
+                    "minimum": -180.0
+                  },
+                  {
+                    "type": "number",
+                    "maximum": 90.0,
+                    "minimum": -90.0
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              "type": "array",
+              "minItems": 4
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Coordinates"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "title": "PolygonGeometry"
+      },
+      "ReferencePoints": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "FeatureCollection",
+            "title": "Type",
+            "default": "FeatureCollection"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/BoundaryFeature"
+            },
+            "type": "array",
+            "title": "Features"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ReferencePoints"
+      },
+      "Scenario": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z0-9-]+$",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "period": {
+            "type": "string",
+            "title": "Period"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "period"
+        ],
+        "title": "Scenario"
+      },
+      "ScenarioListResponse": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/Scenario"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "meta",
+          "data"
+        ],
+        "title": "ScenarioListResponse"
+      },
+      "Summary": {
+        "properties": {
+          "daily_trips": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Daily Trips"
+          },
+          "mean_travel_time_min": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Mean Travel Time Min"
+          },
+          "mean_load_percent": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Mean Load Percent"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "daily_trips",
+          "mean_travel_time_min",
+          "mean_load_percent"
+        ],
+        "title": "Summary"
+      },
+      "ValidationIssue": {
+        "properties": {
+          "field": {
+            "type": "string",
+            "title": "Field"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "field",
+          "message"
+        ],
+        "title": "ValidationIssue"
+      },
+      "YearComparison": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "baseline",
+              "selected"
+            ],
+            "title": "Role"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "observed_feature_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Observed Feature Count"
+          },
+          "missing_feature_ids": {
+            "items": {
+              "type": "string",
+              "maxLength": 80,
+              "pattern": "^[a-z][a-z0-9_-]*$"
+            },
+            "type": "array",
+            "title": "Missing Feature Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "role",
+          "year",
+          "value",
+          "observed_feature_count",
+          "missing_feature_ids"
+        ],
+        "title": "YearComparison"
+      }
+    }
+  }
+}

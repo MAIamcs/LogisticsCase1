@@ -1,0 +1,947 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "water"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              82.78,
+              55.16
+            ],
+            [
+              82.82,
+              55.11
+            ],
+            [
+              82.868,
+              55.065
+            ],
+            [
+              82.883,
+              55.02
+            ],
+            [
+              82.917,
+              54.972
+            ],
+            [
+              82.99,
+              54.923
+            ],
+            [
+              83.016,
+              54.868
+            ],
+            [
+              83.04,
+              54.82
+            ],
+            [
+              83.07,
+              54.75
+            ],
+            [
+              83.04599999999999,
+              54.75
+            ],
+            [
+              83.016,
+              54.82
+            ],
+            [
+              82.992,
+              54.868
+            ],
+            [
+              82.966,
+              54.923
+            ],
+            [
+              82.893,
+              54.972
+            ],
+            [
+              82.859,
+              55.02
+            ],
+            [
+              82.844,
+              55.065
+            ],
+            [
+              82.79599999999999,
+              55.11
+            ],
+            [
+              82.756,
+              55.16
+            ],
+            [
+              82.78,
+              55.16
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "park"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              82.95,
+              55.09
+            ],
+            [
+              82.99000000000001,
+              55.096000000000004
+            ],
+            [
+              82.986,
+              55.118
+            ],
+            [
+              82.94,
+              55.1124
+            ],
+            [
+              82.95,
+              55.09
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "park"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              83.055,
+              54.87
+            ],
+            [
+              83.10300000000001,
+              54.876
+            ],
+            [
+              83.0982,
+              54.904999999999994
+            ],
+            [
+              83.045,
+              54.897999999999996
+            ],
+            [
+              83.055,
+              54.87
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "park"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              82.82,
+              54.945
+            ],
+            [
+              82.865,
+              54.951
+            ],
+            [
+              82.86049999999999,
+              54.97
+            ],
+            [
+              82.80999999999999,
+              54.965
+            ],
+            [
+              82.82,
+              54.945
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "park"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              83.12,
+              54.95
+            ],
+            [
+              83.16600000000001,
+              54.956
+            ],
+            [
+              83.1614,
+              54.978
+            ],
+            [
+              83.11,
+              54.9724
+            ],
+            [
+              83.12,
+              54.95
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "park"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              83.08,
+              54.785
+            ],
+            [
+              83.12,
+              54.791
+            ],
+            [
+              83.116,
+              54.805
+            ],
+            [
+              83.07,
+              54.800999999999995
+            ],
+            [
+              83.08,
+              54.785
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.81,
+            54.97
+          ],
+          [
+            82.83200000000001,
+            55.045
+          ],
+          [
+            82.82000000000001,
+            55.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.828,
+            54.97
+          ],
+          [
+            82.85000000000001,
+            55.045
+          ],
+          [
+            82.83800000000001,
+            55.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.846,
+            54.97
+          ],
+          [
+            82.86800000000001,
+            55.045
+          ],
+          [
+            82.85600000000001,
+            55.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.864,
+            54.97
+          ],
+          [
+            82.88600000000001,
+            55.045
+          ],
+          [
+            82.87400000000001,
+            55.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.882,
+            54.97
+          ],
+          [
+            82.90400000000001,
+            55.045
+          ],
+          [
+            82.89200000000001,
+            55.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.9,
+            54.97
+          ],
+          [
+            82.92200000000001,
+            55.045
+          ],
+          [
+            82.91000000000001,
+            55.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.918,
+            54.97
+          ],
+          [
+            82.94000000000001,
+            55.045
+          ],
+          [
+            82.92800000000001,
+            55.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.936,
+            54.97
+          ],
+          [
+            82.95800000000001,
+            55.045
+          ],
+          [
+            82.94600000000001,
+            55.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.95400000000001,
+            54.97
+          ],
+          [
+            82.97600000000001,
+            55.045
+          ],
+          [
+            82.96400000000001,
+            55.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.97200000000001,
+            54.97
+          ],
+          [
+            82.99400000000001,
+            55.045
+          ],
+          [
+            82.98200000000001,
+            55.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.99000000000001,
+            54.97
+          ],
+          [
+            83.01200000000001,
+            55.045
+          ],
+          [
+            83.00000000000001,
+            55.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            83.008,
+            54.97
+          ],
+          [
+            83.03,
+            55.045
+          ],
+          [
+            83.018,
+            55.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            83.026,
+            54.97
+          ],
+          [
+            83.048,
+            55.045
+          ],
+          [
+            83.036,
+            55.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.8,
+            54.971
+          ],
+          [
+            82.92,
+            54.977
+          ],
+          [
+            83.05,
+            54.965999999999994
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.8,
+            54.985
+          ],
+          [
+            82.92,
+            54.991
+          ],
+          [
+            83.05,
+            54.98
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.8,
+            54.998999999999995
+          ],
+          [
+            82.92,
+            55.004999999999995
+          ],
+          [
+            83.05,
+            54.99399999999999
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.8,
+            55.013
+          ],
+          [
+            82.92,
+            55.019
+          ],
+          [
+            83.05,
+            55.007999999999996
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.8,
+            55.026999999999994
+          ],
+          [
+            82.92,
+            55.032999999999994
+          ],
+          [
+            83.05,
+            55.02199999999999
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.8,
+            55.041
+          ],
+          [
+            82.92,
+            55.047
+          ],
+          [
+            83.05,
+            55.035999999999994
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.8,
+            55.055
+          ],
+          [
+            82.92,
+            55.061
+          ],
+          [
+            83.05,
+            55.05
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.8,
+            55.068999999999996
+          ],
+          [
+            82.92,
+            55.074999999999996
+          ],
+          [
+            83.05,
+            55.06399999999999
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "street"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.8,
+            55.083
+          ],
+          [
+            82.92,
+            55.089
+          ],
+          [
+            83.05,
+            55.077999999999996
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "road"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.931,
+            55.03
+          ],
+          [
+            82.951,
+            55.009
+          ],
+          [
+            82.983,
+            54.978
+          ],
+          [
+            83.045,
+            54.946
+          ],
+          [
+            83.091,
+            54.912
+          ],
+          [
+            83.106,
+            54.854
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "road"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.893,
+            54.982
+          ],
+          [
+            82.909,
+            54.995
+          ],
+          [
+            82.926,
+            55.006
+          ],
+          [
+            82.942,
+            55.019
+          ],
+          [
+            82.931,
+            55.03
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "road"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.692,
+            54.997
+          ],
+          [
+            82.744,
+            54.999
+          ],
+          [
+            82.81,
+            54.997
+          ],
+          [
+            82.857,
+            54.989
+          ],
+          [
+            82.893,
+            54.982
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "road"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            82.967,
+            55.105
+          ],
+          [
+            82.957,
+            55.082
+          ],
+          [
+            82.951,
+            55.06
+          ],
+          [
+            82.942,
+            55.043
+          ],
+          [
+            82.931,
+            55.03
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "road"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            83.106,
+            54.854
+          ],
+          [
+            83.12,
+            54.831
+          ],
+          [
+            83.13,
+            54.802
+          ],
+          [
+            83.111,
+            54.762
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "category": "road"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            83.181,
+            54.937
+          ],
+          [
+            83.16,
+            54.917
+          ],
+          [
+            83.13,
+            54.887
+          ],
+          [
+            83.106,
+            54.854
+          ]
+        ]
+      }
+    }
+  ]
+}
