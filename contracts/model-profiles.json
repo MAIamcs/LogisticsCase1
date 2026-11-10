@@ -1,0 +1,52 @@
+{
+  "Дзержинский": {
+    "is_main_road": 1,
+    "lanes_total": 8,
+    "population": 174360
+  },
+  "Железнодорожный": {
+    "is_main_road": 1,
+    "lanes_total": 6,
+    "population": 64972
+  },
+  "Заельцовский": {
+    "is_main_road": 1,
+    "lanes_total": 6,
+    "population": 149100
+  },
+  "Калининский": {
+    "is_main_road": 1,
+    "lanes_total": 4,
+    "population": 200694
+  },
+  "Кировский": {
+    "is_main_road": 1,
+    "lanes_total": 6,
+    "population": 186408
+  },
+  "Ленинский": {
+    "is_main_road": 1,
+    "lanes_total": 4,
+    "population": 303500
+  },
+  "Октябрьский": {
+    "is_main_road": 1,
+    "lanes_total": 6,
+    "population": 225879
+  },
+  "Первомайский": {
+    "is_main_road": 1,
+    "lanes_total": 4,
+    "population": 87912
+  },
+  "Советский": {
+    "is_main_road": 1,
+    "lanes_total": 4,
+    "population": 141911
+  },
+  "Центральный": {
+    "is_main_road": 1,
+    "lanes_total": 6,
+    "population": 78794
+  }
+}

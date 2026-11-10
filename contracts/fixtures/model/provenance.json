@@ -1,0 +1,9 @@
+{
+  "source": "model-training.csv",
+  "source_sha256": "96665cd62314acd73799594e4d8a3ef79c1da3445468413cd9036f2732b3667e",
+  "rows": 3360,
+  "districts": 10,
+  "profile_count": 140,
+  "model_sha256": "4ccc8aa44af40c96784eed35e5b7516835172795da366bd889f0531317030706",
+  "retrained": false
+}

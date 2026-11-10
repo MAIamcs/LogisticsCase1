@@ -92,7 +92,7 @@ def test_http_metadata_prediction_errors_and_cors(model):
         assert len(metadata.features) == 7
         geography_ids = {feature.id for feature in metadata.geography.boundaries.features}
         assert {district.feature_id for district in metadata.districts} <= geography_ids
-        assert next(f for f in metadata.features if f.name == "season").options == []
+        assert next(f for f in metadata.features if f.name == "season").options == ["Лето", "Не лето"]
         response = client.post("/api/v1/model/predict", json={"features": INPUT, "include_hourly_profile": True})
         assert response.status_code == 200
         result = ModelPredictionResponse.model_validate(response.json())

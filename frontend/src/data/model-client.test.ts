@@ -53,12 +53,18 @@ describe('CatBoost model transport', () => {
     expect(result.hourly_profile.map(point => point.hour)).toEqual(Array.from({ length: 24 }, (_, hour) => hour));
   });
 
-  it('makes no model requests in static demo mode', async () => {
-    const fetcher = vi.fn<typeof fetch>(() => json(metadata));
+  it('loads schema-validated saved predictions in Pages mode without API calls', async () => {
+    const storedMetadata = JSON.parse(readFileSync(new URL('../../../contracts/fixtures/model/metadata.json', import.meta.url), 'utf8'));
+    const records = JSON.parse(readFileSync(new URL('../../../contracts/fixtures/model/predictions.json', import.meta.url), 'utf8'));
+    const fetcher = vi.fn<typeof fetch>(url => json(String(url).endsWith('metadata.json') ? storedMetadata : records));
     const client = createModelClient({ BASE_URL: '/LogisticsCase1/', VITE_DATA_MODE: 'demo' }, fetcher);
-    await expect(client.getMetadata()).rejects.toThrow();
-    await expect(client.predict(features, metadata)).rejects.toThrow();
-    expect(fetcher).not.toHaveBeenCalled();
+    const catalog = await client.getMetadata();
+    for (const record of records) expect(validateModelPrediction(record)).toBe(true);
+    const input = { ...records[0].features, hour: 12 };
+    const result = await client.predict(input, catalog);
+    expect(result.prediction.value).toBe(records[0].hourly_profile[12].value);
+    expect(fetcher.mock.calls.every(([url]) => String(url).startsWith('/LogisticsCase1/demo/model/'))).toBe(true);
+    await expect(client.predict({ ...input, population: 1 }, catalog)).rejects.toThrow('нет сохранённого');
   });
 
   it('surfaces API failure without substituting static data', async () => {

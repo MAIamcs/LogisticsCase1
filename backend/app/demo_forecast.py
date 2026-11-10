@@ -39,6 +39,14 @@ def build_metadata(source: dict) -> ForecastMetadataResponse:
     for item in source["features"]:
         if "geometry_id" in item:
             record = boundary_record(catalog[item["geometry_id"]])
+            if record['geometry']['type'] in {'LineString', 'MultiLineString'}:
+                pieces = []
+                for road in geographic_features('roads.geojson'):
+                    if road['properties'].get('name') == item['name']:
+                        geometry = road['geometry']
+                        if geometry['type'] == 'LineString': pieces.append(geometry['coordinates'])
+                        elif geometry['type'] == 'MultiLineString': pieces.extend(geometry['coordinates'])
+                if pieces: record['geometry'] = {'type': 'MultiLineString', 'coordinates': pieces}
             if record["id"] != item["feature_id"] or record["properties"]["name"] != item["name"]:
                 raise ValueError("Statistical feature identity must match the versioned real geography")
             boundaries.append(record)

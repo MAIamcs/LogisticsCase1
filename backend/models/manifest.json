@@ -28,8 +28,9 @@
   ],
   "tree_count": 1499,
   "has_year_feature": false,
-  "training_csv_available": false,
+  "training_csv_available": true,
   "numeric_imputation_statistics_available": false,
-  "season_categories_verified": false,
-  "preprocessing_sha256": "223edd0ab2840350c1530a29d94ffc693e3240851e5ab2eb524efa5edd84dfcb"
+  "season_categories_verified": true,
+  "preprocessing_sha256": "223edd0ab2840350c1530a29d94ffc693e3240851e5ab2eb524efa5edd84dfcb",
+  "training_csv_sha256": "96665cd62314acd73799594e4d8a3ef79c1da3445468413cd9036f2732b3667e"
 }

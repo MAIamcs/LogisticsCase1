@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AlertCircle, ArrowRight, Database, Route } from 'lucide-react';
+import { AlertCircle, ArrowRight, Route } from 'lucide-react';
 import { ForecastControls } from './components/ForecastControls';
 import { ForecastMap, type LayerVisibility } from './components/ForecastMap';
 import { MapParameters } from './components/MapParameters';
@@ -15,7 +15,7 @@ import './city-workspace.css';
 import { deltaUnitLabel, formatDelta, formatValue, intervalKey, qualityLabel, severityLabels, summaryForSelection, unitLabel } from './forecast/presentation';
 
 export function App() {
-  const [view, setView] = useState<'model' | 'planning'>(import.meta.env.VITE_DATA_MODE === 'api' ? 'model' : 'planning');
+  const [view, setView] = useState<'model' | 'planning'>('model');
   return <>
     <nav className="workspace-navigation page-width" aria-label="Режим работы">
       <button type="button" aria-pressed={view === 'model'} onClick={() => setView('model')}>Модель загруженности</button>
@@ -46,6 +46,14 @@ function PlanningWorkspace() {
   const showDemo = workspace.mode === 'demo' || metadata?.is_demo === true || forecast?.is_demo === true;
   const names = new Map(geographyFeatures(metadata).map(feature => [feature.id, feature.properties.name]));
   const aggregates = summaryForSelection(forecast, selectedId);
+  function selectObject(id: string) {
+    const feature = metadata?.geography.boundaries.features.find(item => item.id === id);
+    if (feature && definition && selection && !definition.geometry_types.includes(feature.geometry.type)) {
+      const compatible = metadata?.metrics.find(metric => metric.geometry_types.includes(feature.geometry.type));
+      if (compatible) workspace.setSelection({ ...selection, metric: compatible.id });
+    }
+    setSelectedId(id);
+  }
   function selectParameters(next: ForecastSelection) {
     if (next.metric !== selection?.metric && selectedId && metadata) {
       const object = geographyFeatures(metadata).find(feature => feature.id === selectedId);
@@ -100,9 +108,9 @@ function PlanningWorkspace() {
         <div className="section-heading"><div><h2 id="map-heading">Карта Новосибирска</h2><p>{definition ? `${definition.name} · ${selection?.year} год · ${unit}` : loading ? 'Границы и значения загружаются из описания набора данных' : 'Данные карты недоступны'}</p></div><span className="section-meta">{forecast ? `${forecast.geojson.features.length} объектов` : 'Нет загруженных значений'}</span></div>
 
         <div className="map-layout">
-          <div className="map-primary"><ForecastMap metadata={metadata} forecast={forecast} selectedId={selectedId} affectedIds={affectedIds} onSelect={setSelectedId} changeMode={changeMode} scale={scale} visibility={visibility} loadLayer={workspace.loadGeographyLayer} />{loading && <div className="map-loading" role="status">Загрузка карты показателя…</div>}</div>
+          <div className="map-primary"><ForecastMap metadata={metadata} forecast={forecast} selectedId={selectedId} affectedIds={affectedIds} onSelect={selectObject} changeMode={changeMode} scale={scale} visibility={visibility} loadLayer={workspace.loadGeographyLayer} />{loading && <div className="map-loading" role="status">Загрузка карты показателя…</div>}</div>
           <aside className="map-details" aria-label="Объекты и критические интервалы">
-            <MapParameters metadata={metadata} selection={selection} onChange={selectParameters} selectedId={selectedId} onSelect={setSelectedId} visibility={visibility} onLayerChange={(id, value) => setVisibility(current => ({ ...current, [id]: value }))} loading={loading} canReload={workspace.canReload} onReload={workspace.reload} />
+            <MapParameters metadata={metadata} selection={selection} onChange={selectParameters} selectedId={selectedId} onSelect={selectObject} visibility={visibility} onLayerChange={(id, value) => setVisibility(current => ({ ...current, [id]: value }))} loading={loading} canReload={workspace.canReload} onReload={workspace.reload} />
             <fieldset className="change-mode"><legend>Отображать изменение</legend><label><input type="radio" name="change-mode" value="absolute" checked={changeMode === 'absolute'} onChange={() => setChangeMode('absolute')} /> Абсолютное ({deltaUnit || 'единица показателя'})</label><label><input type="radio" name="change-mode" value="percent" checked={changeMode === 'percent'} onChange={() => setChangeMode('percent')} /> Процентное (%)</label></fieldset>
             <ObjectCard metadata={metadata} forecast={forecast} selectedId={selectedId} intervals={intervals} onIntervalSelect={setSelectedIntervalKey} />
 
@@ -129,23 +137,10 @@ function PlanningWorkspace() {
 
       <section className="comparison-section" aria-labelledby="comparison-heading" aria-busy={loading}>
         <div className="section-heading"><div><h2 id="comparison-heading">Сравнение годов</h2><p>Базовый и выбранный год. Пропуски обозначены текстом и не заменяются нулями.</p></div></div>
-        {forecast ? <><ForecastComparison forecast={forecast} series={result!.series} definition={definition} selectedId={selectedId} selectedName={names.get(selectedId) ?? selectedId} onSelect={setSelectedId} onYearSelect={year => selection && workspace.setSelection({ ...selection, year })} changeMode={changeMode} scale={scale} /><div className="table-scroll" role="region" aria-label="Таблица сравнения объектов; при необходимости прокрутите горизонтально" tabIndex={0}><table><caption>Значения по объектам · {unit}</caption><thead><tr><th scope="col">Объект</th><th scope="col">{forecast.base_year}, базовый</th><th scope="col">{forecast.forecast_year}, прогноз</th><th scope="col">Изменение, {deltaUnit}</th><th scope="col">Изменение, %</th><th scope="col">Полнота данных</th></tr></thead><tbody>{forecast.geojson.features.map(feature => <tr key={feature.id} className={selectedId === feature.id ? 'selected-row' : ''}><th scope="row"><button onClick={() => setSelectedId(feature.id)} aria-pressed={selectedId === feature.id}>{feature.properties.name}</button></th><td>{formatValue(feature.properties.baseline_value)}</td><td>{formatValue(feature.properties.forecast_value)}</td><td>{formatDelta(feature.properties.delta_absolute)}</td><td>{formatDelta(feature.properties.delta_percent)}</td><td className="quality-cell">{qualityLabel(feature.properties.quality_status)}</td></tr>)}</tbody></table></div></> : <div className="section-placeholder">{loading ? 'Загрузка сравнительных показателей…' : 'Нет загруженных данных для сравнения. Повторите запрос.'}</div>}
+        {forecast ? <><ForecastComparison forecast={forecast} series={result!.series} definition={definition} selectedId={selectedId} selectedName={names.get(selectedId) ?? selectedId} onSelect={selectObject} onYearSelect={year => selection && workspace.setSelection({ ...selection, year })} changeMode={changeMode} scale={scale} /><div className="table-scroll" role="region" aria-label="Таблица сравнения объектов; при необходимости прокрутите горизонтально" tabIndex={0}><table><caption>Значения по объектам · {unit}</caption><thead><tr><th scope="col">Объект</th><th scope="col">{forecast.base_year}, базовый</th><th scope="col">{forecast.forecast_year}, прогноз</th><th scope="col">Изменение, {deltaUnit}</th><th scope="col">Изменение, %</th><th scope="col">Полнота данных</th></tr></thead><tbody>{forecast.geojson.features.map(feature => <tr key={feature.id} className={selectedId === feature.id ? 'selected-row' : ''}><th scope="row"><button onClick={() => setSelectedId(feature.id)} aria-pressed={selectedId === feature.id}>{feature.properties.name}</button></th><td>{formatValue(feature.properties.baseline_value)}</td><td>{formatValue(feature.properties.forecast_value)}</td><td>{formatDelta(feature.properties.delta_absolute)}</td><td>{formatDelta(feature.properties.delta_percent)}</td><td className="quality-cell">{qualityLabel(feature.properties.quality_status)}</td></tr>)}</tbody></table></div></> : <div className="section-placeholder">{loading ? 'Загрузка сравнительных показателей…' : 'Нет загруженных данных для сравнения. Повторите запрос.'}</div>}
       </section>
 
-      <footer className="sources-section" aria-labelledby="sources-heading">
-        <div className="section-heading"><div><h2 id="sources-heading"><Database size={18} aria-hidden="true" />Источники и ограничения</h2></div></div>
-        <dl className="source-grid"><div><dt>Источник</dt><dd>{showDemo ? 'Синтетическая демонстрационная статистика' : metadata ? 'Подключённый поставщик прогнозных данных' : 'Описание источника не загружено'}</dd></div><div><dt>Версия данных</dt><dd>{forecast?.data_version ?? metadata?.data_version ?? 'Нет данных'}</dd></div><div><dt>Версия модели</dt><dd>{forecast?.model_version ?? 'Нет данных'}</dd></div><div><dt>Базовый год из набора</dt><dd>{metadata?.base_year ?? 'Нет данных'}</dd></div></dl>
-        <p className="source-disclaimer">{forecast?.disclaimer ?? metadata?.disclaimer ?? (showDemo ? 'Демонстрационные данные не являются прогнозом. Аналитическая модель не подключена.' : 'Ограничения поставщика появятся после загрузки описания набора.')}</p>
-        {metadata && <p className="source-geography">География: {metadata.geography.description} Координаты — WGS84 (долгота, широта).</p>}
-        <div id="map-attribution" className="map-provider-terms"><h3>Источники геоданных</h3>
-          <p>Версия географии: {metadata?.geography.geography_version ?? 'Не загружена'}. {metadata?.geography.description}</p>
-          {metadata?.geography.sources?.map(source => <p key={source.id}><a href={/^https?:\/\//.test(source.url) ? source.url : undefined} target="_blank" rel="noreferrer">{source.name}</a> · {source.attribution}. {source.license}{source.license_url && <> · <a href={/^https?:\/\//.test(source.license_url) ? source.license_url : undefined} target="_blank" rel="noreferrer">Условия использования</a></>}.</p>)}
-          <p>Отображение: <a href="https://maplibre.org/" target="_blank" rel="noreferrer">MapLibre GL JS</a>, BSD-3-Clause. Реальная география и демонстрационные значения имеют отдельные источники. Подсветка использует исходные контуры районов.</p>
-        </div>
-        <p className="source-limits">Итоги учитывают только известные значения. Если состав наблюдаемых объектов различается, общее изменение не определяется. Нулевое значение отличается от отсутствующего. Решения о вмешательстве требуют проверки исходных данных и выводов аналитической модели.</p>
-        {forecast && <details className="quality-warnings"><summary>Предупреждения о качестве данных ({forecast.warnings.length})</summary>{forecast.warnings.length ? <ul>{forecast.warnings.map((warning, index) => <li key={`${warning.code}-${index}`}><strong>{warning.severity === 'warning' ? 'Внимание. ' : 'Сведения. '}</strong>{warning.message}{warning.feature_ids.length > 0 && <span> Территории: {warning.feature_ids.map(id => names.get(id) ?? id).join('; ')}.</span>}</li>)}</ul> : <p>Поставщик не передал предупреждений о качестве данных.</p>}</details>}
-        <div className="footer-line"><span>Транспортное планирование · Новосибирск</span><span>Контракт данных {forecast?.schema_version ?? metadata?.schema_version ?? '—'}</span></div>
-      </footer>
+
     </main>
     {showDemo && <small className="persistent-demo" role="note">Demo data. Analytical model not connected.</small>}
   </div>;

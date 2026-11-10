@@ -18,7 +18,7 @@ WARNINGS = [
     DISCLAIMER,
     "Целевая метрика построена расчётным способом; независимая проверка на измерениях дорожного движения не приложена.",
     "Граница района показывает контекст выбранного профиля дороги, а не среднюю загрузку района.",
-    "Обучающий CSV и статистики заполнения пропусков отсутствуют: все семь признаков обязательны. Категорию сезона укажите точно как при обучении; её словарь не сохранён.",
+    "Все семь признаков обязательны. Профили районов и категории сезона доступны в приложенном обучающем CSV; статистики заполнения пропусков не сохранены.",
     "Модель не предоставляет интервалы неопределённости или критические интервалы вмешательства.",
 ]
 
@@ -90,14 +90,14 @@ class CongestionModel:
             ModelFeatureDefinition(name="district", label="Район", kind="category", options=list(DISTRICTS)),
             ModelFeatureDefinition(name="is_main_road", label="Главная дорога (1 — да, 0 — нет)", kind="integer", minimum=0, maximum=1),
             ModelFeatureDefinition(name="day_of_week", label="День недели", kind="category", options=list(WEEKDAYS)),
-            ModelFeatureDefinition(name="season", label="Сезон (категория из обучения)", kind="category"),
+            ModelFeatureDefinition(name="season", label="Сезон (категория из обучения)", kind="category", options=["Лето", "Не лето"]),
             ModelFeatureDefinition(name="lanes_total", label="Всего полос на участке", kind="integer", minimum=1, maximum=MAX_SAFE_INTEGER),
             ModelFeatureDefinition(name="population", label="Население района, чел.", kind="integer", minimum=0, maximum=MAX_SAFE_INTEGER),
         ]
         return ModelMetadata(
             status=status, model_version=self.model_version, model_sha256=self.model_sha256,
             features=definitions, districts=[ModelDistrict(name=name, feature_id=feature_id) for name, feature_id in DISTRICTS.items()],
-            season_suggestions=["Лето", "Не лето"], disclaimer=DISCLAIMER + " Написание категорий сезона необходимо сверить с обучающим CSV.",
+            season_suggestions=["Лето", "Не лето"], disclaimer=DISCLAIMER + " Категории сезона подтверждены обучающим CSV.",
             geography=geography, unavailable_reason=reason,
         )
 

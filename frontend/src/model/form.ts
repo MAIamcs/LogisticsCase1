@@ -8,7 +8,7 @@ export function initialModelDraft(metadata: ModelMetadata): ModelDraft {
   return {
     hour: '12', district: '', is_main_road: '',
     day_of_week: weekdays.includes('Понедельник') ? 'Понедельник' : '',
-    season: '',
+    season: metadata.season_suggestions.includes('Не лето') ? 'Не лето' : '',
     lanes_total: '', population: '',
   };
 }

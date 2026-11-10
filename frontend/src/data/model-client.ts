@@ -63,11 +63,18 @@ export function createModelClient(env: Environment, fetcher: typeof fetch = fetc
     return value;
   }
 
+  async function staticJson(path: string, signal?: AbortSignal): Promise<unknown> {
+    const response = await fetcher(`${env.BASE_URL || '/'}demo/model/${path}`, { signal });
+    if (!response.ok) throw new ModelDataError('Не удалось загрузить сохранённые результаты модели. Повторите запрос.');
+    return response.json();
+  }
   return {
     mode: config.mode,
     loadGeographyLayer: geography.getGeographyLayer,
     async getMetadata(signal?: AbortSignal): Promise<ModelMetadata> {
-      const metadata = await read('/api/v1/model/metadata', validateModelMetadata, signal);
+      const value = config.mode === 'demo' ? await staticJson('metadata.json', signal) : await read('/api/v1/model/metadata', validateModelMetadata, signal);
+      if (!validateModelMetadata(value)) throw new ModelDataError('Некорректное описание модели.');
+      const metadata = value;
       const names = metadata.features.map(feature => feature.name);
       if (names.length !== modelFeatureNames.length || modelFeatureNames.some(name => !names.includes(name)) || metadata.has_year_feature !== false) {
         throw new ModelDataError('Описание признаков модели не соответствует контракту 1.0.');
@@ -76,7 +83,16 @@ export function createModelClient(env: Environment, fetcher: typeof fetch = fetc
     },
     async predict(features: ModelFeatures, metadata: ModelMetadata, signal?: AbortSignal): Promise<ModelPredictionResponse> {
       if (metadata.status !== 'ready') throw new ModelDataError(metadata.unavailable_reason || 'Модель временно недоступна.', 503);
-      const result = await read('/api/v1/model/predict', validateModelPrediction, signal, { features, include_hourly_profile: true });
+      let result: ModelPredictionResponse;
+      if (config.mode === 'demo') {
+        const records = await staticJson('predictions.json', signal);
+        if (!Array.isArray(records)) throw new ModelDataError('Некорректные результаты модели.');
+        const saved = records.find(row => validateModelPrediction(row) && modelFeatureNames.filter(name => name !== 'hour').every(name => row.features[name] === features[name]));
+        if (!saved || !validateModelPrediction(saved)) throw new ModelDataError('Для этой комбинации нет сохранённого расчёта. Используйте профиль обучающего набора или подключите API.');
+        const point = saved.hourly_profile.find(point => point.hour === features.hour);
+        if (!point) throw new ModelDataError('Нет расчёта выбранного часа.');
+        result = { ...saved, features, prediction: { value: point.value, unit: 'балл', out_of_expected_range: point.value < 0 || point.value > 10 } };
+      } else result = await read('/api/v1/model/predict', validateModelPrediction, signal, { features, include_hourly_profile: true });
       if (result.model_version !== metadata.model_version || result.target.id !== metadata.target.id || result.target.unit !== metadata.target.unit
         || result.feature_id !== metadata.districts.find(district => district.name === features.district)?.feature_id
         || modelFeatureNames.some(name => result.features[name] !== features[name])) {

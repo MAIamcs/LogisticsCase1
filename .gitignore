@@ -27,3 +27,9 @@ htmlcov/
 coverage/
 *.log
 .envrc
+
+# Versioned inference output required by static Pages.
+!contracts/fixtures/model/predictions.json
+
+# User-supplied training source stays local; publish only serving artifacts.
+/contracts/model-training.csv

@@ -125,7 +125,7 @@ export function ForecastMap({ metadata, forecast, selectedId, affectedIds, onSel
       instance.addLayer({ id: 'forecast-zones', type: 'fill', source: 'forecast', filter: polygon, paint: { 'fill-color': ['get', 'render_color'], 'fill-opacity': .28 } });
       instance.addLayer({ id: 'forecast-zone-outline', type: 'line', source: 'forecast', filter: polygon, paint: { 'line-color': '#839aa9', 'line-width': .7 } });
       instance.addLayer({ id: 'district-outline', type: 'line', source: 'catalog', filter: polygon, paint: { 'line-color': '#657e90', 'line-width': 1, 'line-dasharray': [4, 2] } });
-      instance.addLayer({ id: 'forecast-sections', type: 'line', source: 'forecast', filter: line, layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['get', 'render_color'], 'line-width': 5 } });
+      instance.addLayer({ id: 'forecast-sections', type: 'line', source: 'forecast', filter: line, layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['get', 'render_color'], 'line-width': ['interpolate', ['linear'], ['zoom'], 8, 5, 12, 7, 16, 12] } });
       instance.addLayer({ id: 'forecast-undefined', type: 'line', source: 'forecast', filter: ['all', ['!=', ['geometry-type'], 'Point'], ['==', ['get', 'render_change'], null]], paint: { 'line-color': '#7c868d', 'line-width': 1.5, 'line-dasharray': [2, 2] } });
       instance.addLayer({ id: 'stops', type: 'circle', source: 'catalog', filter: point, paint: { 'circle-radius': 4, 'circle-color': '#fff', 'circle-stroke-color': '#47687e', 'circle-stroke-width': 1.5 } });
       instance.addLayer({ id: 'forecast-points', type: 'circle', source: 'forecast', filter: point, paint: { 'circle-radius': 5, 'circle-color': ['get', 'render_color'], 'circle-stroke-color': '#3e566b', 'circle-stroke-width': 1 } });
@@ -141,7 +141,7 @@ export function ForecastMap({ metadata, forecast, selectedId, affectedIds, onSel
         if (typeof hit?.properties?.feature_id === 'string') callback.current(hit.properties.feature_id);
       });
       instance.on('mousemove', event => { instance.getCanvas().style.cursor = instance.queryRenderedFeatures(event.point, { layers: hits }).length ? 'pointer' : ''; });
-      instance.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: '<a href="#map-attribution">Источники и условия</a> | MapLibre' }), 'bottom-right');
+      instance.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap</a> | MapLibre' }), 'bottom-right');
       setReady(true);
     });
     instance.on('error', event => {

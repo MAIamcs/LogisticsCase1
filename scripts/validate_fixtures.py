@@ -48,6 +48,13 @@ def main() -> None:
         if not response.is_demo:
             raise ValueError(f"Static forecast must declare is_demo=true: {path.relative_to(ROOT)}")
 
+    from app.model_schemas import ModelMetadata, ModelPredictionResponse
+    model_metadata = ModelMetadata.model_validate(read(fixtures / 'model/metadata.json'))
+    model_predictions = [ModelPredictionResponse.model_validate(row) for row in read(fixtures / 'model/predictions.json')]
+    assert {row.features.district for row in model_predictions} == {row.name for row in model_metadata.districts}
+    assert len(model_predictions) == 140
+    assert all(row.model_version == model_metadata.model_version for row in model_predictions)
+
     scenarios = ScenarioListResponse.model_validate(read(fixtures / "scenarios.json"))
     legacy_json = {fixtures / "scenarios.json"}
     for scenario in scenarios.data:

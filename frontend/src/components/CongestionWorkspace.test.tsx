@@ -31,7 +31,7 @@ function tagFor(html: string, name: string) {
 describe('congestion model controls', () => {
   it('asks the user for road properties without inventing training defaults', () => {
     const draft = initialModelDraft(metadata);
-    expect(draft).toMatchObject({ hour: '12', district: '', is_main_road: '', day_of_week: 'Понедельник', season: '', lanes_total: '', population: '' });
+    expect(draft).toMatchObject({ hour: '12', district: '', is_main_road: '', day_of_week: 'Понедельник', season: 'Не лето', lanes_total: '', population: '' });
     const html = renderToStaticMarkup(<CongestionForm metadata={metadata} draft={draft} onChange={() => {}} onSubmit={() => {}} predicting={false} />);
     for (const name of ['hour', 'district', 'is_main_road', 'day_of_week', 'season', 'lanes_total', 'population']) {
       expect(tagFor(html, name)).toContain('required');

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
-import { AlertCircle, Database, RefreshCw, Route } from 'lucide-react';
+import { AlertCircle, RefreshCw, Route } from 'lucide-react';
 import type { ModelMetadata, ModelPredictionResponse } from '../data/model-client';
 import { modelFeatureNames } from '../data/model-client';
 import { changeScale, type MapCatalog } from '../forecast/map-model';
@@ -7,6 +7,7 @@ import { featuresFromDraft, initialModelDraft, type ModelDraft } from '../model/
 import { useCongestionModel } from '../model/useCongestionModel';
 import { ForecastMap, type LayerVisibility } from './ForecastMap';
 import './congestion-workspace.css';
+import districtProfiles from '../../../contracts/model-profiles.json';
 
 const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 3 });
 const noAffectedObjects: string[] = [];
@@ -41,8 +42,8 @@ export function CongestionForm({ metadata, draft, onChange, onSubmit, predicting
           onChange={event => update(event.target.value)} />;
       }
       return <label className="control-field" key={name}>{feature.label}{control}
-        {name === 'season' && <small id="model-season-help">Подсказки можно изменить. Категории обучающей выборки не подтверждены.</small>}
-        {name === 'population' && <small id="model-population-help">Укажите население для вашего профиля. Автоматической подстановки нет.</small>}
+        {name === 'season' && <small id="model-season-help">Подсказки можно изменить. В обучении используются «Лето» и «Не лето».</small>}
+        {name === 'population' && <small id="model-population-help">Укажите население для вашего профиля. Значение из обучающего профиля можно изменить в режиме API.</small>}
       </label>;
     })}
     <datalist id="model-season-suggestions">{metadata.season_suggestions.map(season => <option key={season} value={season} />)}</datalist>
@@ -91,7 +92,17 @@ export function CongestionWorkspace({ onShowPlanning }: { onShowPlanning: () => 
     geography: { ...metadata.geography, boundaries: { ...metadata.geography.boundaries, features: metadata.geography.boundaries.features.filter(feature => feature.geometry.type.includes('Polygon')) }, reference_points: { type: 'FeatureCollection', features: [] } },
   } : null, [metadata]);
   const selectedId = metadata?.districts.find(district => district.name === draft?.district)?.feature_id ?? '';
-  function updateDraft(next: ModelDraft) { model.clearPrediction(); setFormError(''); setDraft(next); }
+  function updateDraft(next: ModelDraft) {
+    if (next.district !== draft?.district) {
+      const profile = districtProfiles[next.district as keyof typeof districtProfiles];
+      if (profile) next = { ...next, lanes_total: String(profile.lanes_total), population: String(profile.population), is_main_road: String(profile.is_main_road) };
+    }
+    model.clearPrediction(); setFormError(''); setDraft(next);
+  }
+  useEffect(() => {
+    if (!draft || !metadata || !draft.district) return;
+    try { model.predict(featuresFromDraft(draft, metadata)); } catch { /* Incomplete input remains editable. */ }
+  }, [draft, metadata]);
   function submit() {
     if (!draft || !metadata) return;
     try { const features = featuresFromDraft(draft, metadata); setFormError(''); model.predict(features); }
@@ -101,12 +112,11 @@ export function CongestionWorkspace({ onShowPlanning }: { onShowPlanning: () => 
   const unavailable = metadata?.status === 'unavailable';
 
   return <div className="city-workspace congestion-workspace">
-    {isStatic && <small className="persistent-demo" role="note">Demo data. Analytical model not connected.</small>}
     <a className="skip-link" href="#model-main">Перейти к модели</a>
     <header className="page-header page-width"><div className="project-label"><Route size={18} aria-hidden="true" /><span>Новосибирск · CatBoost</span></div><h1>Модель загруженности дорог</h1></header>
     <main id="model-main" className="page-width model-main" tabIndex={-1}>
       <p className="model-intro">Оценка загруженности для одного профиля дороги по семи введённым признакам. Результат выражен в баллах с ожидаемым диапазоном 0–10.</p>
-      {isStatic && <section className="model-status-panel" aria-labelledby="static-model-heading"><h2 id="static-model-heading">Модель доступна через API</h2><p>Эта версия сайта работает со статическими демонстрационными данными. Для вычисления CatBoost нужен подключённый сервис модели в режиме API.</p><button type="button" onClick={onShowPlanning}>Открыть демонстрацию планирования</button></section>}
+      {isStatic && <p className="model-intro">Сохранённые расчёты CatBoost по обучающим профилям 10 районов. Для произвольных параметров нужен API.</p>}
       <div className="request-state" role="status" aria-live="polite">{loading ? 'Загрузка описания модели…' : predicting ? 'Вычисление оценки и почасового профиля…' : result ? 'Результат модели загружен для выбранных параметров.' : metadata?.status === 'ready' ? 'Модель готова. Заполните параметры и запустите расчёт.' : unavailable ? 'Модель недоступна.' : ''}</div>
       {(error || formError) && <div className="error-box" role="alert"><AlertCircle size={20} aria-hidden="true" /><div><strong>Расчёт не выполнен</strong><p>{formError || error}</p>{!metadata && model.canReload && <button type="button" onClick={model.reload}>Повторить загрузку</button>}</div></div>}
       {unavailable && <section className="model-status-panel" aria-labelledby="unavailable-model-heading"><h2 id="unavailable-model-heading">Сервис модели не готов</h2><p>{metadata.unavailable_reason || 'Обученный файл модели недоступен. Повторите загрузку позднее.'}</p><button type="button" onClick={model.reload}>Проверить доступность</button></section>}
@@ -129,7 +139,7 @@ export function CongestionWorkspace({ onShowPlanning }: { onShowPlanning: () => 
         </section>
       </>}
 
-      {metadata && <footer className="sources-section model-sources" aria-labelledby="model-sources-heading"><div className="section-heading"><h2 id="model-sources-heading"><Database size={18} aria-hidden="true" />Источник и ограничения модели</h2></div><p className="source-disclaimer">{metadata.disclaimer}</p><p className="source-limits">Год не входит в признаки модели. Почасовой профиль оценивает заданные условия; многолетний прогноз и доверительные интервалы модель не предоставляет.</p><dl className="source-grid"><div><dt>Модель</dt><dd>Обученный CatBoost · {metadata.model_version}</dd></div><div><dt>Целевая величина</dt><dd>{metadata.target.id}</dd></div><div><dt>SHA-256 файла модели</dt><dd className="model-sha">{metadata.model_sha256 || 'Недоступен'}</dd></div></dl><div id="map-attribution" className="map-provider-terms"><h3>Источники географии</h3><p>{metadata.geography.description}</p>{(metadata.geography.sources ?? []).map(source => <p key={source.id}><a href={/^https?:\/\//.test(source.url) ? source.url : undefined} target="_blank" rel="noreferrer">{source.name}</a> · {source.attribution}. {source.license}</p>)}<p>Отображение: <a href="https://maplibre.org/" target="_blank" rel="noreferrer">MapLibre GL JS</a>. География не является источником значений загруженности.</p></div><div className="footer-line"><span>CatBoost · семь исходных признаков</span><span>Контракт модели {metadata.schema_version}</span></div></footer>}
+
     </main>
   </div>;
 }

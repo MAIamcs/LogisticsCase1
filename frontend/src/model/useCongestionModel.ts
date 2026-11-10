@@ -9,7 +9,7 @@ export function useCongestionModel() {
   });
   const [metadata, setMetadata] = useState<ModelMetadata | null>(null);
   const [result, setResult] = useState<ModelPredictionResponse | null>(null);
-  const [loading, setLoading] = useState(setup.client?.mode === 'api');
+  const [loading, setLoading] = useState(true);
   const [predicting, setPredicting] = useState(false);
   const [error, setError] = useState(setup.error);
   const [revision, setRevision] = useState(0);
@@ -17,7 +17,7 @@ export function useCongestionModel() {
   const [predictionRequest] = useState<{ cancel?: () => void }>(() => ({}));
 
   useEffect(() => {
-    if (!setup.client || setup.client.mode !== 'api') return;
+    if (!setup.client) return;
     predictionRequest.cancel?.(); setPredicting(false); setResult(null);
     setLoading(true); setError(''); setMetadata(null);
     const request = requests.metadata.run(signal => setup.client!.getMetadata(signal), catalog => {
@@ -43,6 +43,6 @@ export function useCongestionModel() {
   return {
     metadata, result, loading, predicting, error, mode: setup.client?.mode,
     predict, clearPrediction, reload: () => setRevision(value => value + 1),
-    canReload: setup.client?.mode === 'api', loadGeographyLayer: setup.client?.loadGeographyLayer,
+    canReload: !!setup.client, loadGeographyLayer: setup.client?.loadGeographyLayer,
   };
 }
