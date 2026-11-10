@@ -8,6 +8,11 @@ contracts/geography/roads.geojson
 contracts/geography/buildings.geojson
 *.tsbuildinfo
 .venv/
+.venv-model/
+# Inference outputs and notebook/training logs are local artifacts.
+catboost_info/
+predictions*.json
+predictions*.csv
 __pycache__/
 .pytest_cache/
 *.egg-info/

@@ -2,7 +2,7 @@
 
 ## Prerequisites and checkout
 
-Use Node.js 22.12+ (CI uses 24), pnpm 11.25.0 and Python 3.11+ (CI uses 3.12).
+Use Node.js 22.12+ (CI uses 24), pnpm 11.25.0 and Python 3.12 for trained-model inference (CI uses 3.12).
 Install pnpm through your Node toolchain. Work from the root of an existing
 checkout, or clone into the requested local directory:
 
@@ -64,7 +64,7 @@ Run from the repository root in another terminal:
 ```sh
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r backend/requirements-dev.lock
+python -m pip install -r backend/requirements-dev.lock -r backend/requirements-model.lock
 python -m uvicorn app.main:app --app-dir backend --reload --host 127.0.0.1 --port 8000
 ```
 
@@ -77,8 +77,17 @@ process manager and HTTPS proxy.
 No backend hosting provider is prescribed by this scaffold.
 
 Swagger is at `http://127.0.0.1:8000/docs`. The backend serves real geographic
-layers and synthetic statistical fixtures. It never claims that the analytical
-model is connected.
+layers and synthetic annual statistical fixtures. Separately,
+`/api/v1/model/metadata` reports readiness of the supplied trained CBM and
+`POST /api/v1/model/predict` performs inference. The frontend's model view
+requires API mode. See [model integration](model-integration.md) for the seven
+required inputs, CLI, Windows PowerShell setup and model limitations.
+
+The model is retained in `backend/models/`, not bundled in the Python wheel or
+the frontend. Deploy that directory with the checkout or set the absolute
+`CATBOOST_MODEL_PATH`. Inference never executes `analyzer.ipynb` or training
+logs. An artifact replacement requires a server restart; version is the hash of
+the loaded bytes. No district profile or year effect is inferred from demo data.
 
 ## Frontend — API mode
 

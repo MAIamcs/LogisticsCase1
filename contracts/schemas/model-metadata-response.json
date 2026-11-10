@@ -1,0 +1,776 @@
+{
+  "$defs": {
+    "BoundaryCollection": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "FeatureCollection",
+          "title": "Type",
+          "type": "string"
+        },
+        "features": {
+          "items": {
+            "$ref": "#/$defs/BoundaryFeature"
+          },
+          "minItems": 1,
+          "title": "Features",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "features"
+      ],
+      "title": "BoundaryCollection",
+      "type": "object"
+    },
+    "BoundaryFeature": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Feature",
+          "title": "Type",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "geometry": {
+          "discriminator": {
+            "mapping": {
+              "LineString": "#/$defs/LineGeometry",
+              "MultiLineString": "#/$defs/MultiLineGeometry",
+              "MultiPolygon": "#/$defs/MultiPolygonGeometry",
+              "Point": "#/$defs/PointGeometry",
+              "Polygon": "#/$defs/PolygonGeometry"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/PolygonGeometry"
+            },
+            {
+              "$ref": "#/$defs/MultiPolygonGeometry"
+            },
+            {
+              "$ref": "#/$defs/LineGeometry"
+            },
+            {
+              "$ref": "#/$defs/MultiLineGeometry"
+            },
+            {
+              "$ref": "#/$defs/PointGeometry"
+            }
+          ],
+          "title": "Geometry"
+        },
+        "properties": {
+          "$ref": "#/$defs/BoundaryProperties"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "BoundaryFeature",
+      "type": "object"
+    },
+    "BoundaryProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "feature_id": {
+          "maxLength": 80,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Feature Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "pattern": "^[a-z][a-z0-9_-]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        }
+      },
+      "required": [
+        "feature_id",
+        "name"
+      ],
+      "title": "BoundaryProperties",
+      "type": "object"
+    },
+    "Geography": {
+      "additionalProperties": false,
+      "properties": {
+        "crs": {
+          "const": "EPSG:4326",
+          "title": "Crs",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "bbox": {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Bbox",
+          "type": "array"
+        },
+        "boundaries": {
+          "$ref": "#/$defs/BoundaryCollection"
+        },
+        "reference_points": {
+          "$ref": "#/$defs/ReferencePoints"
+        },
+        "geography_version": {
+          "default": "unspecified",
+          "minLength": 1,
+          "title": "Geography Version",
+          "type": "string"
+        },
+        "is_synthetic": {
+          "default": false,
+          "title": "Is Synthetic",
+          "type": "boolean"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/GeographySource"
+          },
+          "title": "Sources",
+          "type": "array"
+        },
+        "layers": {
+          "items": {
+            "$ref": "#/$defs/GeographyLayer"
+          },
+          "title": "Layers",
+          "type": "array"
+        }
+      },
+      "required": [
+        "crs",
+        "description",
+        "bbox",
+        "boundaries"
+      ],
+      "title": "Geography",
+      "type": "object"
+    },
+    "GeographyLayer": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "geometry_types": {
+          "items": {
+            "enum": [
+              "Polygon",
+              "MultiPolygon",
+              "LineString",
+              "MultiLineString",
+              "Point"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Geometry Types",
+          "type": "array"
+        },
+        "source_id": {
+          "maxLength": 80,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "asset_path": {
+          "minLength": 1,
+          "title": "Asset Path",
+          "type": "string"
+        },
+        "feature_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feature Count"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "geometry_types",
+        "source_id",
+        "asset_path"
+      ],
+      "title": "GeographyLayer",
+      "type": "object"
+    },
+    "GeographySource": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 80,
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "url": {
+          "minLength": 1,
+          "title": "Url",
+          "type": "string"
+        },
+        "attribution": {
+          "minLength": 1,
+          "title": "Attribution",
+          "type": "string"
+        },
+        "license": {
+          "minLength": 1,
+          "title": "License",
+          "type": "string"
+        },
+        "license_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "License Url"
+        },
+        "retrieved_at": {
+          "minLength": 1,
+          "title": "Retrieved At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "url",
+        "attribution",
+        "license",
+        "retrieved_at"
+      ],
+      "title": "GeographySource",
+      "type": "object"
+    },
+    "LineGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "LineString",
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "maximum": 180,
+                "minimum": -180,
+                "type": "number"
+              },
+              {
+                "maximum": 90,
+                "minimum": -90,
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "minItems": 2,
+          "title": "Coordinates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "LineGeometry",
+      "type": "object"
+    },
+    "ModelDistrict": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "enum": [
+            "Дзержинский",
+            "Железнодорожный",
+            "Заельцовский",
+            "Калининский",
+            "Кировский",
+            "Ленинский",
+            "Октябрьский",
+            "Первомайский",
+            "Советский",
+            "Центральный"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "feature_id": {
+          "title": "Feature Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "feature_id"
+      ],
+      "title": "ModelDistrict",
+      "type": "object"
+    },
+    "ModelFeatureDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "enum": [
+            "hour",
+            "district",
+            "is_main_road",
+            "day_of_week",
+            "season",
+            "lanes_total",
+            "population"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "integer",
+            "category"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "required": {
+          "const": true,
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "minimum": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minimum"
+        },
+        "maximum": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum"
+        },
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Options",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "label",
+        "kind"
+      ],
+      "title": "ModelFeatureDefinition",
+      "type": "object"
+    },
+    "ModelTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "const": "congestion_index_0_10",
+          "default": "congestion_index_0_10",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "default": "Расчётный индекс загруженности",
+          "title": "Name",
+          "type": "string"
+        },
+        "unit": {
+          "const": "балл",
+          "default": "балл",
+          "title": "Unit",
+          "type": "string"
+        },
+        "expected_min": {
+          "const": 0,
+          "default": 0,
+          "title": "Expected Min",
+          "type": "integer"
+        },
+        "expected_max": {
+          "const": 10,
+          "default": 10,
+          "title": "Expected Max",
+          "type": "integer"
+        },
+        "description": {
+          "default": "Оценка CatBoost по целевой переменной обучающего датасета; не время проезда и не измеренный процент загрузки.",
+          "title": "Description",
+          "type": "string"
+        }
+      },
+      "title": "ModelTarget",
+      "type": "object"
+    },
+    "MultiLineGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "MultiLineString",
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            "minItems": 2,
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "MultiLineGeometry",
+      "type": "object"
+    },
+    "MultiPolygonGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "MultiPolygon",
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "items": {
+              "items": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "maximum": 180,
+                    "minimum": -180,
+                    "type": "number"
+                  },
+                  {
+                    "maximum": 90,
+                    "minimum": -90,
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "minItems": 4,
+              "type": "array"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "MultiPolygonGeometry",
+      "type": "object"
+    },
+    "PointGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Point",
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "maximum": 180,
+              "minimum": -180,
+              "type": "number"
+            },
+            {
+              "maximum": 90,
+              "minimum": -90,
+              "type": "number"
+            }
+          ],
+          "title": "Coordinates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "PointGeometry",
+      "type": "object"
+    },
+    "PolygonGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Polygon",
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            "minItems": 4,
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "PolygonGeometry",
+      "type": "object"
+    },
+    "ReferencePoints": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "FeatureCollection",
+          "default": "FeatureCollection",
+          "title": "Type",
+          "type": "string"
+        },
+        "features": {
+          "items": {
+            "$ref": "#/$defs/BoundaryFeature"
+          },
+          "title": "Features",
+          "type": "array"
+        }
+      },
+      "title": "ReferencePoints",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "unavailable"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "model_version": {
+      "title": "Model Version",
+      "type": "string"
+    },
+    "model_sha256": {
+      "title": "Model Sha256",
+      "type": "string"
+    },
+    "target": {
+      "$ref": "#/$defs/ModelTarget"
+    },
+    "features": {
+      "items": {
+        "$ref": "#/$defs/ModelFeatureDefinition"
+      },
+      "title": "Features",
+      "type": "array"
+    },
+    "districts": {
+      "items": {
+        "$ref": "#/$defs/ModelDistrict"
+      },
+      "title": "Districts",
+      "type": "array"
+    },
+    "season_suggestions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Season Suggestions",
+      "type": "array"
+    },
+    "has_year_feature": {
+      "const": false,
+      "default": false,
+      "title": "Has Year Feature",
+      "type": "boolean"
+    },
+    "disclaimer": {
+      "title": "Disclaimer",
+      "type": "string"
+    },
+    "geography": {
+      "$ref": "#/$defs/Geography"
+    },
+    "unavailable_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Unavailable Reason"
+    }
+  },
+  "required": [
+    "status",
+    "model_version",
+    "model_sha256",
+    "features",
+    "districts",
+    "season_suggestions",
+    "disclaimer",
+    "geography",
+    "unavailable_reason"
+  ],
+  "title": "ModelMetadata",
+  "type": "object"
+}

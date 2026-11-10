@@ -2,12 +2,12 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import maplibregl, { type ExpressionSpecification, type GeoJSONSource, type Map as LibreMap } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
 import { LocateFixed, Minus, Plus } from 'lucide-react';
-import type { ForecastMetadata, ForecastResponse, GeographyLayer } from '../data/forecast-client';
-import { dataBounds, geographyFeatures, labelPosition, renderCollection, type ChangeMode, type ChangeScale } from '../forecast/map-model';
+import type { ForecastResponse, GeographyLayer } from '../data/forecast-client';
+import { dataBounds, geographyFeatures, labelPosition, renderCollection, type ChangeMode, type ChangeScale, type MapCatalog } from '../forecast/map-model';
 
 export type LayerVisibility = Record<string, boolean>;
 type Props = {
-  metadata: ForecastMetadata | null; forecast: ForecastResponse | null;
+  metadata: MapCatalog | null; forecast: ForecastResponse | null;
   selectedId: string; affectedIds: string[]; onSelect: (id: string) => void;
   changeMode: ChangeMode; scale: ChangeScale; visibility: LayerVisibility;
   loadLayer?: (layer: GeographyLayer, signal?: AbortSignal) => Promise<FeatureCollection>;
@@ -20,7 +20,7 @@ const analyticalLayers = ['forecast-zones', 'forecast-sections', 'forecast-point
 const districtLayers = ['district-outline'];
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!);
 
-function fitData(instance: LibreMap, metadata: ForecastMetadata | null) {
+function fitData(instance: LibreMap, metadata: MapCatalog | null) {
   const bounds = dataBounds(metadata);
   if (bounds) instance.fitBounds(bounds, { padding: 35, duration: 0, maxZoom: 13 });
 }

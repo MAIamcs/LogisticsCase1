@@ -3,6 +3,7 @@ import type { ForecastMetadata, ForecastResponse } from '../data/forecast-client
 
 export type ChangeMode = 'absolute' | 'percent';
 export type MetricDefinition = ForecastMetadata['metrics'][number];
+export type MapCatalog = Pick<ForecastMetadata, 'geography' | 'data_version'>;
 export type MapFeature = ForecastResponse['geojson']['features'][number];
 export type ChangeScale = {
   transportLoad: boolean;
@@ -72,11 +73,11 @@ export function geometryPositions(geometry: Geometry): Position[] {
   return walk(geometry.coordinates);
 }
 
-export function geographyFeatures(metadata: ForecastMetadata | null) {
+export function geographyFeatures(metadata: MapCatalog | null) {
   return metadata ? [...metadata.geography.boundaries.features, ...(metadata.geography.reference_points?.features ?? [])] : [];
 }
 
-export function dataBounds(metadata: ForecastMetadata | null): [[number, number], [number, number]] | null {
+export function dataBounds(metadata: MapCatalog | null): [[number, number], [number, number]] | null {
   const positions = geographyFeatures(metadata).flatMap(feature => geometryPositions(feature.geometry));
   return positions.length ? [[Math.min(...positions.map(p => p[0])), Math.min(...positions.map(p => p[1]))],
     [Math.max(...positions.map(p => p[0])), Math.max(...positions.map(p => p[1]))]] : null;

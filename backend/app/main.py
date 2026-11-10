@@ -16,6 +16,8 @@ from .models import ErrorResponse, HealthResponse, PlanningResponse, ScenarioLis
 from .geography_provider import GeographyProvider, LocalGeographyProvider
 from .services import PlanningService, get_planning_service
 from .settings import Settings
+from .congestion_model import CongestionModel, ModelUnavailable
+from .model_schemas import ModelMetadata, ModelPredictionRequest, ModelPredictionResponse
 
 Service = Annotated[PlanningService, Depends(get_planning_service)]
 Provider = Annotated[ForecastProvider, Depends(get_forecast_provider)]
@@ -40,18 +42,19 @@ def validated_metadata(provider: ForecastProvider) -> ForecastMetadataResponse:
     return metadata
 
 
-def create_app(*, settings: Settings | None = None, forecast_provider: ForecastProvider | None = None, geography_provider: GeographyProvider | None = None) -> FastAPI:
+def create_app(*, settings: Settings | None = None, forecast_provider: ForecastProvider | None = None, geography_provider: GeographyProvider | None = None, congestion_model: CongestionModel | None = None) -> FastAPI:
     settings = settings or Settings.from_environment()
     app = FastAPI(
-        title="Novosibirsk Transport Planning API", version="0.4.0",
-        description="Provider-independent forecast and real geography API. Statistical values from the default provider remain synthetic demonstrations, not a real forecast.",
+        title="Novosibirsk Transport Planning API", version="0.5.0",
+        description="Annual planning/demo and real geography API, with a separate trained CatBoost road-profile inference API. CatBoost predicts congestion_index_0_10, not future-year forecasts or travel time.",
     )
     app.state.forecast_provider = forecast_provider if forecast_provider is not None else DemoForecastProvider(settings.forecast_demo_data_dir)
     app.state.geography_provider = geography_provider if geography_provider is not None else LocalGeographyProvider(settings.geography_data_dir)
+    app.state.congestion_model = congestion_model if congestion_model is not None else CongestionModel(settings.catboost_model_path)
     app.add_middleware(
         CORSMiddleware, allow_origins=list(settings.cors_allow_origins),
         allow_credentials=settings.cors_allow_credentials,
-        allow_methods=["GET"], allow_headers=["Accept", "Content-Type"],
+        allow_methods=["GET", "POST"], allow_headers=["Accept", "Content-Type"],
     )
 
     @app.exception_handler(HTTPException)
@@ -73,6 +76,11 @@ def create_app(*, settings: Settings | None = None, forecast_provider: ForecastP
         logging.getLogger(__name__).warning("Forecast provider unavailable", exc_info=exc)
         return error_response(503, "service_unavailable", "Forecast provider is unavailable. Please retry later.")
 
+    @app.exception_handler(ModelUnavailable)
+    async def model_unavailable(_request: Request, exc: ModelUnavailable):
+        logging.getLogger(__name__).warning("Congestion model unavailable", exc_info=exc)
+        return error_response(503, "service_unavailable", str(exc))
+
     @app.exception_handler(ValueError)
     @app.exception_handler(Exception)
     async def unexpected_error(_request: Request, exc: Exception):
@@ -81,7 +89,18 @@ def create_app(*, settings: Settings | None = None, forecast_provider: ForecastP
 
     @app.get("/api/v1/health", response_model=HealthResponse)
     def health(provider: Provider):
-        return HealthResponse(model_status="not_integrated" if provider.is_demo else "provider_configured")
+        return HealthResponse(
+            model_status="not_integrated" if provider.is_demo else "provider_configured",
+            congestion_model_status=app.state.congestion_model.status()[0],
+        )
+
+    @app.get("/api/v1/model/metadata", response_model=ModelMetadata, responses=errors)
+    def model_metadata(provider: Provider):
+        return app.state.congestion_model.metadata(validated_metadata(provider).geography)
+
+    @app.post("/api/v1/model/predict", response_model=ModelPredictionResponse, responses=errors)
+    def model_predict(payload: ModelPredictionRequest):
+        return app.state.congestion_model.predict(payload.features, payload.include_hourly_profile)
 
     @app.get("/api/v1/metadata", response_model=ForecastMetadataResponse, responses=errors)
     def metadata(provider: Provider):

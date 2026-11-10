@@ -1,0 +1,35 @@
+{
+  "artifact": "catboost_congestion.cbm",
+  "sha256": "4ccc8aa44af40c96784eed35e5b7516835172795da366bd889f0531317030706",
+  "bytes": 1738416,
+  "catboost_version": "1.2.10",
+  "target": "congestion_index_0_10",
+  "source": "User-provided trained model; inference only, no retraining",
+  "preprocessing_source": "User-provided analyzer.ipynb",
+  "raw_features": [
+    "hour",
+    "district",
+    "is_main_road",
+    "day_of_week",
+    "season",
+    "lanes_total",
+    "population"
+  ],
+  "derived_features": [
+    "hour_sin",
+    "hour_cos",
+    "dow_sin",
+    "dow_cos"
+  ],
+  "categorical_indices": [
+    1,
+    3,
+    4
+  ],
+  "tree_count": 1499,
+  "has_year_feature": false,
+  "training_csv_available": false,
+  "numeric_imputation_statistics_available": false,
+  "season_categories_verified": false,
+  "preprocessing_sha256": "223edd0ab2840350c1530a29d94ffc693e3240851e5ab2eb524efa5edd84dfcb"
+}

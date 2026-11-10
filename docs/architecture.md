@@ -2,8 +2,9 @@
 
 The repository was inspected before implementation: commit `b7dab5f` contained
 only `README.md`, with no existing application or project instructions. The
-framework now has one Russian planning workspace and two interchangeable data
-transports. The analytical model remains an integration boundary.
+framework now has a Russian annual planning workspace with two interchangeable
+data transports and a separate API-only CatBoost road-profile view. The supplied
+model has no year feature and does not replace the annual planning provider.
 
 ## Components
 
@@ -14,6 +15,8 @@ transports. The analytical model remains an integration boundary.
 | `backend/app/forecast_models.py` | Schema 1.2: metadata, geography, finite/null values, aggregates, comparison and interval validation |
 | `backend/app/forecast_provider.py` | Replaceable `ForecastProvider`; default `DemoForecastProvider` reads canonical statistical fixtures |
 | `backend/app/geography_provider.py` | Independent `GeographyProvider`; default local real GeoJSON layer delivery |
+| `backend/app/congestion_model.py`, `model_schemas.py` | Load the supplied CBM once, validate seven raw inputs, compute four cyclic features, return raw index and optional 24-hour profile |
+| `backend/models/` | Supplied immutable CBM and provenance manifest; inference uses CatBoost 1.2.10 |
 | `backend/app/` | FastAPI routes, parameter/error validation and explicit environment-driven CORS |
 | `contracts/fixtures/forecast/` | Thirty forecast combinations, metadata and geography response shared by API/static mode |
 | `contracts/geography/` | Real geographic assets, source snapshots, version and individual attribution/licensing |
@@ -22,9 +25,25 @@ transports. The analytical model remains an integration boundary.
 | `backend/tests/`, `frontend/src/**/*.test.*` | Contract, parity, provider replacement, numerical/coverage and UI presentation checks |
 | `.github/workflows/` | Shared CI and static GitHub Pages deployment |
 
-There is no authentication, chat, administration, database, job queue or model-run
-screen. Legacy corridor endpoints and reusable components remain a compatibility
+There is no authentication, chat, administration, database or job queue.
+Legacy corridor endpoints and reusable components remain a compatibility
 seam, not an additional screen.
+
+## Supplied model integration
+
+`CongestionWorkspace` → validated model client → `POST /api/v1/model/predict`
+→ shared `ModelFeatures` → cyclic transforms from `analyzer.ipynb` → CatBoost
+`Pool` with verified names/category indices → raw prediction. The CLI uses the
+same service. No notebook cells, fitting, retraining or imputation guesses run
+in either path. `catboost_info` logs are not a serving dependency.
+
+The map highlights the context district only: one manually supplied road profile
+does not measure the district's mean congestion or all its roads. The hourly
+chart evaluates the same model for all 24 hours with the other inputs fixed.
+No synthetic forecast values are fed into CatBoost. Unknown year effects,
+confidence and intervention intervals are not fabricated. Artifact readiness is
+reported separately from the annual provider's status. See
+[model integration](model-integration.md) for deployment and remaining data gaps.
 
 ## Data flow
 

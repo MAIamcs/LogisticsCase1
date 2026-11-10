@@ -26,8 +26,10 @@ jobs:
         with:
           python-version: '3.12'
           cache: pip
-          cache-dependency-path: backend/requirements-dev.lock
-      - run: python -m pip install -r backend/requirements-dev.lock
+          cache-dependency-path: |
+            backend/requirements-dev.lock
+            backend/requirements-model.lock
+      - run: python -m pip install -r backend/requirements-dev.lock -r backend/requirements-model.lock
       - run: python scripts/import_geography.py
       - run: git diff --exit-code -- contracts/geography
       - run: python scripts/export_contract.py --check

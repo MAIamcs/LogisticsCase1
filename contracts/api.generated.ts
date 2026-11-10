@@ -21,6 +21,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/model/metadata": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Model Metadata */
+        get: operations["model_metadata_api_v1_model_metadata_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/model/predict": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Model Predict */
+        post: operations["model_predict_api_v1_model_predict_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/metadata": {
         parameters: {
             query?: never;
@@ -508,6 +542,18 @@ export interface components {
              * @enum {string}
              */
             model_status: "not_integrated" | "provider_configured";
+            /**
+             * Congestion Model Status
+             * @enum {string}
+             */
+            congestion_model_status: "ready" | "unavailable";
+        };
+        /** HourlyPrediction */
+        HourlyPrediction: {
+            /** Hour */
+            hour: number;
+            /** Value */
+            value: number;
         };
         /** LineGeometry */
         LineGeometry: {
@@ -561,6 +607,181 @@ export interface components {
             semantic_type: "population" | "transport_load" | "trip_demand" | "passenger_flow" | "transport_capacity" | "traffic_intensity" | "other";
             /** Geometry Types */
             geometry_types: ("Polygon" | "MultiPolygon" | "LineString" | "MultiLineString" | "Point")[];
+        };
+        /** ModelDistrict */
+        ModelDistrict: {
+            /**
+             * Name
+             * @enum {string}
+             */
+            name: "Дзержинский" | "Железнодорожный" | "Заельцовский" | "Калининский" | "Кировский" | "Ленинский" | "Октябрьский" | "Первомайский" | "Советский" | "Центральный";
+            /** Feature Id */
+            feature_id: string;
+        };
+        /** ModelFeatureDefinition */
+        ModelFeatureDefinition: {
+            /**
+             * Name
+             * @enum {string}
+             */
+            name: "hour" | "district" | "is_main_road" | "day_of_week" | "season" | "lanes_total" | "population";
+            /** Label */
+            label: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "integer" | "category";
+            /**
+             * Required
+             * @default true
+             * @constant
+             */
+            required: true;
+            /** Minimum */
+            minimum?: number | null;
+            /** Maximum */
+            maximum?: number | null;
+            /** Options */
+            options?: string[];
+        };
+        /** ModelFeatures */
+        ModelFeatures: {
+            /** Hour */
+            hour: number;
+            /**
+             * District
+             * @enum {string}
+             */
+            district: "Дзержинский" | "Железнодорожный" | "Заельцовский" | "Калининский" | "Кировский" | "Ленинский" | "Октябрьский" | "Первомайский" | "Советский" | "Центральный";
+            /** Is Main Road */
+            is_main_road: number;
+            /**
+             * Day Of Week
+             * @enum {string}
+             */
+            day_of_week: "Понедельник" | "Вторник" | "Среда" | "Четверг" | "Пятница" | "Суббота" | "Воскресенье";
+            /** Season */
+            season: string;
+            /** Lanes Total */
+            lanes_total: number;
+            /** Population */
+            population: number;
+        };
+        /** ModelMetadata */
+        ModelMetadata: {
+            /**
+             * Schema Version
+             * @default 1.0
+             * @constant
+             */
+            schema_version: "1.0";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ready" | "unavailable";
+            /** Model Version */
+            model_version: string;
+            /** Model Sha256 */
+            model_sha256: string;
+            target?: components["schemas"]["ModelTarget"];
+            /** Features */
+            features: components["schemas"]["ModelFeatureDefinition"][];
+            /** Districts */
+            districts: components["schemas"]["ModelDistrict"][];
+            /** Season Suggestions */
+            season_suggestions: string[];
+            /**
+             * Has Year Feature
+             * @default false
+             * @constant
+             */
+            has_year_feature: false;
+            /** Disclaimer */
+            disclaimer: string;
+            geography: components["schemas"]["Geography"];
+            /** Unavailable Reason */
+            unavailable_reason: string | null;
+        };
+        /** ModelPredictionRequest */
+        ModelPredictionRequest: {
+            features: components["schemas"]["ModelFeatures"];
+            /**
+             * Include Hourly Profile
+             * @default false
+             */
+            include_hourly_profile: boolean;
+        };
+        /** ModelPredictionResponse */
+        ModelPredictionResponse: {
+            /**
+             * Schema Version
+             * @default 1.0
+             * @constant
+             */
+            schema_version: "1.0";
+            /** Model Version */
+            model_version: string;
+            target?: components["schemas"]["ModelTarget"];
+            features: components["schemas"]["ModelFeatures"];
+            /** Feature Id */
+            feature_id: string;
+            prediction: components["schemas"]["ModelPredictionValue"];
+            /** Hourly Profile */
+            hourly_profile?: components["schemas"]["HourlyPrediction"][];
+            /** Warnings */
+            warnings: string[];
+        };
+        /** ModelPredictionValue */
+        ModelPredictionValue: {
+            /** Value */
+            value: number;
+            /**
+             * Unit
+             * @default балл
+             * @constant
+             */
+            unit: "балл";
+            /** Out Of Expected Range */
+            out_of_expected_range: boolean;
+        };
+        /** ModelTarget */
+        ModelTarget: {
+            /**
+             * Id
+             * @default congestion_index_0_10
+             * @constant
+             */
+            id: "congestion_index_0_10";
+            /**
+             * Name
+             * @default Расчётный индекс загруженности
+             */
+            name: string;
+            /**
+             * Unit
+             * @default балл
+             * @constant
+             */
+            unit: "балл";
+            /**
+             * Expected Min
+             * @default 0
+             * @constant
+             */
+            expected_min: 0;
+            /**
+             * Expected Max
+             * @default 10
+             * @constant
+             */
+            expected_max: 10;
+            /**
+             * Description
+             * @default Оценка CatBoost по целевой переменной обучающего датасета; не время проезда и не измеренный процент загрузки.
+             */
+            description: string;
         };
         /** MultiLineGeometry */
         MultiLineGeometry: {
@@ -710,6 +931,122 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    model_metadata_api_v1_model_metadata_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelMetadata"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    model_predict_api_v1_model_predict_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModelPredictionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelPredictionResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };

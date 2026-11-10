@@ -5,6 +5,7 @@ from urllib.parse import urlsplit
 
 from .forecast_provider import DEFAULT_DEMO_DIRECTORY
 from .geography_provider import DEFAULT_GEOGRAPHY_DIRECTORY
+from .congestion_model import DEFAULT_MODEL_PATH
 
 
 @dataclass(frozen=True)
@@ -13,6 +14,7 @@ class Settings:
     cors_allow_credentials: bool = False
     forecast_demo_data_dir: Path = DEFAULT_DEMO_DIRECTORY
     geography_data_dir: Path = DEFAULT_GEOGRAPHY_DIRECTORY
+    catboost_model_path: Path = DEFAULT_MODEL_PATH
 
     def __post_init__(self):
         for origin in self.cors_allow_origins:
@@ -41,4 +43,5 @@ class Settings:
             cors_allow_credentials=credentials == "true",
             forecast_demo_data_dir=Path(os.getenv("FORECAST_DEMO_DATA_DIR", str(DEFAULT_DEMO_DIRECTORY))),
             geography_data_dir=Path(os.getenv("GEOGRAPHY_DATA_DIR", str(DEFAULT_GEOGRAPHY_DIRECTORY))),
+            catboost_model_path=Path(os.getenv("CATBOOST_MODEL_PATH", str(DEFAULT_MODEL_PATH))),
         )

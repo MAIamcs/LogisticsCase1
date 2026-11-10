@@ -1,0 +1,96 @@
+{
+  "$defs": {
+    "ModelFeatures": {
+      "additionalProperties": false,
+      "properties": {
+        "hour": {
+          "maximum": 23,
+          "minimum": 0,
+          "title": "Hour",
+          "type": "integer"
+        },
+        "district": {
+          "enum": [
+            "Дзержинский",
+            "Железнодорожный",
+            "Заельцовский",
+            "Калининский",
+            "Кировский",
+            "Ленинский",
+            "Октябрьский",
+            "Первомайский",
+            "Советский",
+            "Центральный"
+          ],
+          "title": "District",
+          "type": "string"
+        },
+        "is_main_road": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Is Main Road",
+          "type": "integer"
+        },
+        "day_of_week": {
+          "enum": [
+            "Понедельник",
+            "Вторник",
+            "Среда",
+            "Четверг",
+            "Пятница",
+            "Суббота",
+            "Воскресенье"
+          ],
+          "title": "Day Of Week",
+          "type": "string"
+        },
+        "season": {
+          "maxLength": 80,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Season",
+          "type": "string"
+        },
+        "lanes_total": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "title": "Lanes Total",
+          "type": "integer"
+        },
+        "population": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Population",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "hour",
+        "district",
+        "is_main_road",
+        "day_of_week",
+        "season",
+        "lanes_total",
+        "population"
+      ],
+      "title": "ModelFeatures",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "features": {
+      "$ref": "#/$defs/ModelFeatures"
+    },
+    "include_hourly_profile": {
+      "default": false,
+      "title": "Include Hourly Profile",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "features"
+  ],
+  "title": "ModelPredictionRequest",
+  "type": "object"
+}

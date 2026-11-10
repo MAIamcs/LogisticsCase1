@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Novosibirsk Transport Planning API",
-    "description": "Provider-independent forecast and real geography API. Statistical values from the default provider remain synthetic demonstrations, not a real forecast.",
-    "version": "0.4.0"
+    "description": "Annual planning/demo and real geography API, with a separate trained CatBoost road-profile inference API. CatBoost predicts congestion_index_0_10, not future-year forecasts or travel time.",
+    "version": "0.5.0"
   },
   "paths": {
     "/api/v1/health": {
@@ -17,6 +17,132 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/model/metadata": {
+      "get": {
+        "summary": "Model Metadata",
+        "operationId": "model_metadata_api_v1_model_metadata_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelMetadata"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/model/predict": {
+      "post": {
+        "summary": "Model Predict",
+        "operationId": "model_predict_api_v1_model_predict_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelPredictionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelPredictionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1592,11 +1718,43 @@
             ],
             "title": "Model Status",
             "default": "not_integrated"
+          },
+          "congestion_model_status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "unavailable"
+            ],
+            "title": "Congestion Model Status"
           }
         },
         "additionalProperties": false,
         "type": "object",
+        "required": [
+          "congestion_model_status"
+        ],
         "title": "HealthResponse"
+      },
+      "HourlyPrediction": {
+        "properties": {
+          "hour": {
+            "type": "integer",
+            "maximum": 23.0,
+            "minimum": 0.0,
+            "title": "Hour"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "hour",
+          "value"
+        ],
+        "title": "HourlyPrediction"
       },
       "LineGeometry": {
         "properties": {
@@ -1743,6 +1901,408 @@
           "geometry_types"
         ],
         "title": "MetricDefinition"
+      },
+      "ModelDistrict": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "Дзержинский",
+              "Железнодорожный",
+              "Заельцовский",
+              "Калининский",
+              "Кировский",
+              "Ленинский",
+              "Октябрьский",
+              "Первомайский",
+              "Советский",
+              "Центральный"
+            ],
+            "title": "Name"
+          },
+          "feature_id": {
+            "type": "string",
+            "title": "Feature Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "feature_id"
+        ],
+        "title": "ModelDistrict"
+      },
+      "ModelFeatureDefinition": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "hour",
+              "district",
+              "is_main_road",
+              "day_of_week",
+              "season",
+              "lanes_total",
+              "population"
+            ],
+            "title": "Name"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "integer",
+              "category"
+            ],
+            "title": "Kind"
+          },
+          "required": {
+            "type": "boolean",
+            "const": true,
+            "title": "Required",
+            "default": true
+          },
+          "minimum": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minimum"
+          },
+          "maximum": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maximum"
+          },
+          "options": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Options"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "label",
+          "kind"
+        ],
+        "title": "ModelFeatureDefinition"
+      },
+      "ModelFeatures": {
+        "properties": {
+          "hour": {
+            "type": "integer",
+            "maximum": 23.0,
+            "minimum": 0.0,
+            "title": "Hour"
+          },
+          "district": {
+            "type": "string",
+            "enum": [
+              "Дзержинский",
+              "Железнодорожный",
+              "Заельцовский",
+              "Калининский",
+              "Кировский",
+              "Ленинский",
+              "Октябрьский",
+              "Первомайский",
+              "Советский",
+              "Центральный"
+            ],
+            "title": "District"
+          },
+          "is_main_road": {
+            "type": "integer",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Is Main Road"
+          },
+          "day_of_week": {
+            "type": "string",
+            "enum": [
+              "Понедельник",
+              "Вторник",
+              "Среда",
+              "Четверг",
+              "Пятница",
+              "Суббота",
+              "Воскресенье"
+            ],
+            "title": "Day Of Week"
+          },
+          "season": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Season"
+          },
+          "lanes_total": {
+            "type": "integer",
+            "maximum": 9007199254740991.0,
+            "minimum": 1.0,
+            "title": "Lanes Total"
+          },
+          "population": {
+            "type": "integer",
+            "maximum": 9007199254740991.0,
+            "minimum": 0.0,
+            "title": "Population"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "hour",
+          "district",
+          "is_main_road",
+          "day_of_week",
+          "season",
+          "lanes_total",
+          "population"
+        ],
+        "title": "ModelFeatures"
+      },
+      "ModelMetadata": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1.0",
+            "title": "Schema Version",
+            "default": "1.0"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "unavailable"
+            ],
+            "title": "Status"
+          },
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "model_sha256": {
+            "type": "string",
+            "title": "Model Sha256"
+          },
+          "target": {
+            "$ref": "#/components/schemas/ModelTarget"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/ModelFeatureDefinition"
+            },
+            "type": "array",
+            "title": "Features"
+          },
+          "districts": {
+            "items": {
+              "$ref": "#/components/schemas/ModelDistrict"
+            },
+            "type": "array",
+            "title": "Districts"
+          },
+          "season_suggestions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Season Suggestions"
+          },
+          "has_year_feature": {
+            "type": "boolean",
+            "const": false,
+            "title": "Has Year Feature",
+            "default": false
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          },
+          "geography": {
+            "$ref": "#/components/schemas/Geography"
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "model_version",
+          "model_sha256",
+          "features",
+          "districts",
+          "season_suggestions",
+          "disclaimer",
+          "geography",
+          "unavailable_reason"
+        ],
+        "title": "ModelMetadata"
+      },
+      "ModelPredictionRequest": {
+        "properties": {
+          "features": {
+            "$ref": "#/components/schemas/ModelFeatures"
+          },
+          "include_hourly_profile": {
+            "type": "boolean",
+            "title": "Include Hourly Profile",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "features"
+        ],
+        "title": "ModelPredictionRequest"
+      },
+      "ModelPredictionResponse": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1.0",
+            "title": "Schema Version",
+            "default": "1.0"
+          },
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "target": {
+            "$ref": "#/components/schemas/ModelTarget"
+          },
+          "features": {
+            "$ref": "#/components/schemas/ModelFeatures"
+          },
+          "feature_id": {
+            "type": "string",
+            "title": "Feature Id"
+          },
+          "prediction": {
+            "$ref": "#/components/schemas/ModelPredictionValue"
+          },
+          "hourly_profile": {
+            "items": {
+              "$ref": "#/components/schemas/HourlyPrediction"
+            },
+            "type": "array",
+            "title": "Hourly Profile"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "model_version",
+          "features",
+          "feature_id",
+          "prediction",
+          "warnings"
+        ],
+        "title": "ModelPredictionResponse"
+      },
+      "ModelPredictionValue": {
+        "properties": {
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "const": "балл",
+            "title": "Unit",
+            "default": "балл"
+          },
+          "out_of_expected_range": {
+            "type": "boolean",
+            "title": "Out Of Expected Range"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "value",
+          "out_of_expected_range"
+        ],
+        "title": "ModelPredictionValue"
+      },
+      "ModelTarget": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "const": "congestion_index_0_10",
+            "title": "Id",
+            "default": "congestion_index_0_10"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Расчётный индекс загруженности"
+          },
+          "unit": {
+            "type": "string",
+            "const": "балл",
+            "title": "Unit",
+            "default": "балл"
+          },
+          "expected_min": {
+            "type": "integer",
+            "const": 0,
+            "title": "Expected Min",
+            "default": 0
+          },
+          "expected_max": {
+            "type": "integer",
+            "const": 10,
+            "title": "Expected Max",
+            "default": 10
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": "Оценка CatBoost по целевой переменной обучающего датасета; не время проезда и не измеренный процент загрузки."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ModelTarget"
       },
       "MultiLineGeometry": {
         "properties": {

@@ -6,6 +6,7 @@ import { MapParameters } from './components/MapParameters';
 import { ForecastComparison } from './components/ForecastComparison';
 import { ObjectCard } from './components/ObjectCard';
 import { ChangeLegend } from './components/ChangeLegend';
+import { CongestionWorkspace } from './components/CongestionWorkspace';
 import { changeScale, geographyFeatures, type ChangeMode } from './forecast/map-model';
 import { useForecastWorkspace } from './forecast/useForecastWorkspace';
 import { linkedFeature, workspaceLink } from './forecast/workspace-link';
@@ -14,6 +15,17 @@ import './city-workspace.css';
 import { deltaUnitLabel, formatDelta, formatValue, intervalKey, qualityLabel, severityLabels, summaryForSelection, unitLabel } from './forecast/presentation';
 
 export function App() {
+  const [view, setView] = useState<'model' | 'planning'>(import.meta.env.VITE_DATA_MODE === 'api' ? 'model' : 'planning');
+  return <>
+    <nav className="workspace-navigation page-width" aria-label="Режим работы">
+      <button type="button" aria-pressed={view === 'model'} onClick={() => setView('model')}>Модель загруженности</button>
+      <button type="button" aria-pressed={view === 'planning'} onClick={() => setView('planning')}>Планирование · demo</button>
+    </nav>
+    {view === 'model' ? <CongestionWorkspace onShowPlanning={() => setView('planning')} /> : <PlanningWorkspace />}
+  </>;
+}
+
+function PlanningWorkspace() {
   const workspace = useForecastWorkspace();
   const { metadata, selection, result, loading, error } = workspace;
   const [selectedId, setSelectedId] = useState(() => linkedFeature(window.location.search));

@@ -101,10 +101,57 @@ empty corridor collections are valid and render empty states.
 `HealthResponse` is an operational object, outside the data envelope:
 
 ```json
-{"status":"ok","service":"transport-planning-api","model_status":"not_integrated"}
+{"status":"ok","service":"transport-planning-api","model_status":"not_integrated","congestion_model_status":"ready"}
 ```
 
-It does not assert that an analytical model is available.
+`model_status` describes the annual planning provider. The separate
+`congestion_model_status` describes whether the supplied CatBoost artifact loads
+successfully (`ready` or `unavailable`); it does not validate prediction accuracy.
+
+## Trained CatBoost road-profile inference
+
+This is separate from annual forecasts. `GET /api/v1/model/metadata` returns the
+seven required features, target semantics, model SHA-256/version, district map
+identifiers, geography and readiness. `POST /api/v1/model/predict` accepts:
+
+```json
+{
+  "features": {
+    "hour": 8,
+    "district": "Центральный",
+    "is_main_road": 1,
+    "day_of_week": "Понедельник",
+    "season": "Зима",
+    "lanes_total": 4,
+    "population": 100000
+  },
+  "include_hourly_profile": true
+}
+```
+
+This is a synthetic input example, not a default district profile or verified
+training category. Use the exact season spelling from training. Numeric inputs
+are strict integers: hour 0–23, main-road flag 0/1, lanes ≥1, population ≥0.
+All seven are required; missing values and extra fields (including `year`) yield
+422. No training medians or population defaults are guessed.
+
+The response contains `schema_version: "1.0"`, `model_version`, `target`, the
+validated `features`, district `feature_id`, a raw finite `prediction.value` in
+`балл`, `prediction.out_of_expected_range`, `hourly_profile` (ordered hours 0–23
+when requested, otherwise empty), and `warnings`. Values are not clipped to
+0–10 or converted into percentages. These results describe one supplied road
+profile, not an average of all district roads. Year effects, intervention
+intervals and uncertainty bands are unavailable from this model.
+
+Missing dependencies, missing/incompatible CBM or failed inference return 503 in
+the standard error envelope. Metadata remains readable with `status: unavailable`
+and `unavailable_reason`. No synthetic substitute is returned. POST preflight is
+allowed only for the explicit configured CORS origins.
+
+Authoritative schemas are `model-metadata-response.json`,
+`model-prediction-request.json`, `model-prediction-response.json` in
+`contracts/schemas/`, exported with OpenAPI. See
+[model integration and Windows commands](model-integration.md).
 
 ## Errors and client behavior
 

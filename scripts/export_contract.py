@@ -9,6 +9,7 @@ sys.path.insert(0, str(ROOT / "backend"))
 from app.main import app
 from app.models import PlanningResponse, ScenarioListResponse
 from app.forecast_models import ForecastMetadataResponse, ForecastResponse, Geography, GeographyLayerCollection
+from app.model_schemas import ModelMetadata, ModelPredictionRequest, ModelPredictionResponse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--check", action="store_true")
@@ -21,6 +22,9 @@ artifacts = {
     "contracts/schemas/forecast-response.json": ForecastResponse.model_json_schema(),
     "contracts/schemas/geography-response.json": Geography.model_json_schema(),
     "contracts/schemas/geography-layer-response.json": GeographyLayerCollection.model_json_schema(),
+    "contracts/schemas/model-metadata-response.json": ModelMetadata.model_json_schema(),
+    "contracts/schemas/model-prediction-request.json": ModelPredictionRequest.model_json_schema(),
+    "contracts/schemas/model-prediction-response.json": ModelPredictionResponse.model_json_schema(),
 }
 for name, value in artifacts.items():
     target = ROOT / name

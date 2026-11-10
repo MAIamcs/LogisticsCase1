@@ -1,0 +1,216 @@
+{
+  "$defs": {
+    "HourlyPrediction": {
+      "additionalProperties": false,
+      "properties": {
+        "hour": {
+          "maximum": 23,
+          "minimum": 0,
+          "title": "Hour",
+          "type": "integer"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "hour",
+        "value"
+      ],
+      "title": "HourlyPrediction",
+      "type": "object"
+    },
+    "ModelFeatures": {
+      "additionalProperties": false,
+      "properties": {
+        "hour": {
+          "maximum": 23,
+          "minimum": 0,
+          "title": "Hour",
+          "type": "integer"
+        },
+        "district": {
+          "enum": [
+            "Дзержинский",
+            "Железнодорожный",
+            "Заельцовский",
+            "Калининский",
+            "Кировский",
+            "Ленинский",
+            "Октябрьский",
+            "Первомайский",
+            "Советский",
+            "Центральный"
+          ],
+          "title": "District",
+          "type": "string"
+        },
+        "is_main_road": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Is Main Road",
+          "type": "integer"
+        },
+        "day_of_week": {
+          "enum": [
+            "Понедельник",
+            "Вторник",
+            "Среда",
+            "Четверг",
+            "Пятница",
+            "Суббота",
+            "Воскресенье"
+          ],
+          "title": "Day Of Week",
+          "type": "string"
+        },
+        "season": {
+          "maxLength": 80,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Season",
+          "type": "string"
+        },
+        "lanes_total": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "title": "Lanes Total",
+          "type": "integer"
+        },
+        "population": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Population",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "hour",
+        "district",
+        "is_main_road",
+        "day_of_week",
+        "season",
+        "lanes_total",
+        "population"
+      ],
+      "title": "ModelFeatures",
+      "type": "object"
+    },
+    "ModelPredictionValue": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "title": "Value",
+          "type": "number"
+        },
+        "unit": {
+          "const": "балл",
+          "default": "балл",
+          "title": "Unit",
+          "type": "string"
+        },
+        "out_of_expected_range": {
+          "title": "Out Of Expected Range",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "value",
+        "out_of_expected_range"
+      ],
+      "title": "ModelPredictionValue",
+      "type": "object"
+    },
+    "ModelTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "const": "congestion_index_0_10",
+          "default": "congestion_index_0_10",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "default": "Расчётный индекс загруженности",
+          "title": "Name",
+          "type": "string"
+        },
+        "unit": {
+          "const": "балл",
+          "default": "балл",
+          "title": "Unit",
+          "type": "string"
+        },
+        "expected_min": {
+          "const": 0,
+          "default": 0,
+          "title": "Expected Min",
+          "type": "integer"
+        },
+        "expected_max": {
+          "const": 10,
+          "default": 10,
+          "title": "Expected Max",
+          "type": "integer"
+        },
+        "description": {
+          "default": "Оценка CatBoost по целевой переменной обучающего датасета; не время проезда и не измеренный процент загрузки.",
+          "title": "Description",
+          "type": "string"
+        }
+      },
+      "title": "ModelTarget",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "model_version": {
+      "title": "Model Version",
+      "type": "string"
+    },
+    "target": {
+      "$ref": "#/$defs/ModelTarget"
+    },
+    "features": {
+      "$ref": "#/$defs/ModelFeatures"
+    },
+    "feature_id": {
+      "title": "Feature Id",
+      "type": "string"
+    },
+    "prediction": {
+      "$ref": "#/$defs/ModelPredictionValue"
+    },
+    "hourly_profile": {
+      "items": {
+        "$ref": "#/$defs/HourlyPrediction"
+      },
+      "title": "Hourly Profile",
+      "type": "array"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "model_version",
+    "features",
+    "feature_id",
+    "prediction",
+    "warnings"
+  ],
+  "title": "ModelPredictionResponse",
+  "type": "object"
+}

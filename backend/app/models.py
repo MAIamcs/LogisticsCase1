@@ -100,6 +100,7 @@ class HealthResponse(ContractModel):
     status: Literal["ok"] = "ok"
     service: Literal["transport-planning-api"] = "transport-planning-api"
     model_status: Literal["not_integrated", "provider_configured"] = "not_integrated"
+    congestion_model_status: Literal["ready", "unavailable"]
 
 
 class ValidationIssue(ContractModel):

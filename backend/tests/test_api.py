@@ -16,8 +16,10 @@ def client():
     app.dependency_overrides.clear()
 
 
-def test_health_is_explicit_about_absent_model(client):
-    assert client.get("/api/v1/health").json() == {
+def test_health_separates_annual_provider_from_road_profile_model(client):
+    health = client.get("/api/v1/health").json()
+    assert health.pop("congestion_model_status") in {"ready", "unavailable"}
+    assert health == {
         "status": "ok", "service": "transport-planning-api", "model_status": "not_integrated",
     }
 
