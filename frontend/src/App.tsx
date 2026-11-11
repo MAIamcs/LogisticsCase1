@@ -44,11 +44,16 @@ function PlanningWorkspace() {
   const unit = unitLabel(definition?.unit ?? '');
   const deltaUnit = deltaUnitLabel(definition?.unit ?? '');
   const showDemo = workspace.mode === 'demo' || metadata?.is_demo === true || forecast?.is_demo === true;
-  const names = new Map(geographyFeatures(metadata).map(feature => [feature.id, feature.properties.name]));
-  const aggregates = summaryForSelection(forecast, selectedId);
+  const objects = geographyFeatures(metadata);
+  const names = new Map(objects.map(feature => [feature.id, feature.properties.name]));
+  const selectedObject = objects.find(feature => feature.id === selectedId);
+  const districtAsReference = Boolean(selectedObject?.geometry.type.includes('Polygon')
+    && definition && !definition.geometry_types.includes(selectedObject.geometry.type));
+  const statisticsId = districtAsReference ? '' : selectedId;
+  const aggregates = summaryForSelection(forecast, statisticsId);
   function selectObject(id: string) {
     const feature = metadata?.geography.boundaries.features.find(item => item.id === id);
-    if (feature && definition && selection && !definition.geometry_types.includes(feature.geometry.type)) {
+    if (feature && !feature.geometry.type.includes('Polygon') && definition && selection && !definition.geometry_types.includes(feature.geometry.type)) {
       const compatible = metadata?.metrics.find(metric => metric.semantic_type === 'transport_load' && metric.geometry_types.includes(feature.geometry.type))
         ?? metadata?.metrics.find(metric => metric.geometry_types.includes(feature.geometry.type));
       if (compatible) workspace.setSelection({ ...selection, metric: compatible.id });
@@ -57,9 +62,8 @@ function PlanningWorkspace() {
   }
   function selectParameters(next: ForecastSelection) {
     if (next.metric !== selection?.metric && selectedId && metadata) {
-      const object = geographyFeatures(metadata).find(feature => feature.id === selectedId);
       const target = metadata.metrics.find(metric => metric.id === next.metric);
-      if (object && target && !target.geometry_types.includes(object.geometry.type)) setSelectedId('');
+      if (selectedObject && !selectedObject.geometry.type.includes('Polygon') && target && !target.geometry_types.includes(selectedObject.geometry.type)) setSelectedId('');
     }
     workspace.setSelection(next);
   }
@@ -113,7 +117,7 @@ function PlanningWorkspace() {
           <aside className="map-details" aria-label="Объекты и критические интервалы">
             <MapParameters metadata={metadata} selection={selection} onChange={selectParameters} selectedId={selectedId} onSelect={selectObject} visibility={visibility} onLayerChange={(id, value) => setVisibility(current => ({ ...current, [id]: value }))} loading={loading} canReload={workspace.canReload} onReload={workspace.reload} />
             <fieldset className="change-mode"><legend>Отображать изменение</legend><label><input type="radio" name="change-mode" value="absolute" checked={changeMode === 'absolute'} onChange={() => setChangeMode('absolute')} /> Абсолютное ({deltaUnit || 'единица показателя'})</label><label><input type="radio" name="change-mode" value="percent" checked={changeMode === 'percent'} onChange={() => setChangeMode('percent')} /> Процентное (%)</label></fieldset>
-            <ObjectCard metadata={metadata} forecast={forecast} selectedId={selectedId} intervals={intervals} onIntervalSelect={setSelectedIntervalKey} />
+            <ObjectCard metadata={metadata} forecast={forecast} selectedId={selectedId} districtAsReference={districtAsReference} intervals={intervals} onIntervalSelect={setSelectedIntervalKey} />
 
             <div className="interval-details" ref={intervalDetailsRef}><h3><i className="interval-key" aria-hidden="true" />Критические интервалы</h3>
               {intervals.length > 0 ? <><label className="sr-only" htmlFor="critical-interval-select">Выберите критический интервал</label><select id="critical-interval-select" value={selectedIntervalKey ?? ''} onChange={event => setSelectedIntervalKey(event.target.value || null)}><option value="">Выберите интервал на шкале</option>{intervals.map((item, index) => <option key={intervalKey(item, index)} value={intervalKey(item, index)}>{item.start_year}–{item.end_year} · {severityLabels[item.severity]}</option>)}</select></> : <p className="detail-hint">{loading ? 'Загрузка интервалов поставщика…' : error ? 'Интервалы недоступны из-за ошибки загрузки.' : 'В доступном горизонте поставщик не указал критических интервалов.'}</p>}
@@ -127,18 +131,18 @@ function PlanningWorkspace() {
       </section>
 
       <section className="numbers-section" aria-labelledby="numbers-heading" aria-busy={loading}>
-        <div className="section-heading"><div><h2 id="numbers-heading">Ключевые показатели</h2><p>{selectedId ? names.get(selectedId) ?? selectedId : definition?.description ?? 'Показатели появятся после загрузки данных'}</p></div></div>
+        <div className="section-heading"><div><h2 id="numbers-heading">Ключевые показатели</h2><p>{districtAsReference ? 'Сводка по всем объектам показателя' : statisticsId ? names.get(statisticsId) ?? statisticsId : definition?.description ?? 'Показатели появятся после загрузки данных'}</p></div></div>
         <div className="indicator-grid">
           <article className="indicator-card"><h3>Базовый год · {forecast?.base_year ?? metadata?.base_year ?? '—'}</h3><strong>{formatValue(aggregates?.baseline_value)}</strong><span>{unit || 'Единица из описания показателя'}</span><p>Есть данные: {aggregates?.baseline_observed_count ?? '—'} из {aggregates?.feature_count ?? '—'} объектов</p></article>
           <article className="indicator-card selected-indicator"><h3>Прогноз · {forecast?.forecast_year ?? selection?.year ?? '—'}</h3><strong>{formatValue(aggregates?.forecast_value)}</strong><span>{unit || 'Единица из описания показателя'}</span><p>Есть данные: {aggregates?.forecast_observed_count ?? '—'} из {aggregates?.feature_count ?? '—'} объектов</p></article>
-          <article className={`indicator-card ${changeMode === 'absolute' ? 'active-mode-indicator' : ''}`}><h3>Абсолютное изменение</h3><strong>{forecast ? formatDelta(aggregates?.delta_absolute) : 'Нет данных'}</strong><span>{deltaUnit || '—'}</span><p>{!forecast ? 'Данные не загружены' : aggregates?.coverage_comparable ? selectedId ? 'Изменение выбранного объекта' : 'К базовому году, по сопоставимым объектам' : selectedId ? 'Нет сравнимых значений' : 'Состав наблюдаемых объектов различается'}</p></article>
+          <article className={`indicator-card ${changeMode === 'absolute' ? 'active-mode-indicator' : ''}`}><h3>Абсолютное изменение</h3><strong>{forecast ? formatDelta(aggregates?.delta_absolute) : 'Нет данных'}</strong><span>{deltaUnit || '—'}</span><p>{!forecast ? 'Данные не загружены' : aggregates?.coverage_comparable ? statisticsId ? 'Изменение выбранного объекта' : 'К базовому году, по сопоставимым объектам' : statisticsId ? 'Нет сравнимых значений' : 'Состав наблюдаемых объектов различается'}</p></article>
           <article className={`indicator-card ${changeMode === 'percent' ? 'active-mode-indicator' : ''}`}><h3>Изменение к базовому году</h3><strong>{forecast ? formatDelta(aggregates?.delta_percent) : 'Нет данных'}</strong><span>%</span><p>{!forecast ? 'Данные не загружены' : aggregates?.baseline_value === 0 ? 'Процент не определён при нулевом базовом значении' : aggregates?.coverage_comparable ? selectedId ? 'Изменение выбранного объекта' : 'По сопоставимым объектам' : selectedId ? 'Нет сравнимых значений' : 'Не рассчитывается при различающейся полноте данных'}</p></article>
         </div>
       </section>
 
       <section className="comparison-section" aria-labelledby="comparison-heading" aria-busy={loading}>
         <div className="section-heading"><div><h2 id="comparison-heading">Сравнение годов</h2><p>Базовый и выбранный год. Пропуски обозначены текстом и не заменяются нулями.</p></div></div>
-        {forecast ? <><ForecastComparison forecast={forecast} series={result!.series} definition={definition} selectedId={selectedId} selectedName={names.get(selectedId) ?? selectedId} onSelect={selectObject} onYearSelect={year => selection && workspace.setSelection({ ...selection, year })} changeMode={changeMode} scale={scale} /><div className="table-scroll" role="region" aria-label="Таблица сравнения объектов; при необходимости прокрутите горизонтально" tabIndex={0}><table><caption>Значения по объектам · {unit}</caption><thead><tr><th scope="col">Объект</th><th scope="col">{forecast.base_year}, базовый</th><th scope="col">{forecast.forecast_year}, прогноз</th><th scope="col">Изменение, {deltaUnit}</th><th scope="col">Изменение, %</th><th scope="col">Полнота данных</th></tr></thead><tbody>{forecast.geojson.features.map(feature => <tr key={feature.id} className={selectedId === feature.id ? 'selected-row' : ''}><th scope="row"><button onClick={() => setSelectedId(feature.id)} aria-pressed={selectedId === feature.id}>{feature.properties.name}</button></th><td>{formatValue(feature.properties.baseline_value)}</td><td>{formatValue(feature.properties.forecast_value)}</td><td>{formatDelta(feature.properties.delta_absolute)}</td><td>{formatDelta(feature.properties.delta_percent)}</td><td className="quality-cell">{qualityLabel(feature.properties.quality_status)}</td></tr>)}</tbody></table></div></> : <div className="section-placeholder">{loading ? 'Загрузка сравнительных показателей…' : 'Нет загруженных данных для сравнения. Повторите запрос.'}</div>}
+        {forecast ? <><ForecastComparison forecast={forecast} series={result!.series} definition={definition} selectedId={statisticsId} selectedName={names.get(statisticsId) ?? statisticsId} onSelect={selectObject} onYearSelect={year => selection && workspace.setSelection({ ...selection, year })} changeMode={changeMode} scale={scale} /><div className="table-scroll" role="region" aria-label="Таблица сравнения объектов; при необходимости прокрутите горизонтально" tabIndex={0}><table><caption>Значения по объектам · {unit}</caption><thead><tr><th scope="col">Объект</th><th scope="col">{forecast.base_year}, базовый</th><th scope="col">{forecast.forecast_year}, прогноз</th><th scope="col">Изменение, {deltaUnit}</th><th scope="col">Изменение, %</th><th scope="col">Полнота данных</th></tr></thead><tbody>{forecast.geojson.features.map(feature => <tr key={feature.id} className={selectedId === feature.id ? 'selected-row' : ''}><th scope="row"><button onClick={() => setSelectedId(feature.id)} aria-pressed={selectedId === feature.id}>{feature.properties.name}</button></th><td>{formatValue(feature.properties.baseline_value)}</td><td>{formatValue(feature.properties.forecast_value)}</td><td>{formatDelta(feature.properties.delta_absolute)}</td><td>{formatDelta(feature.properties.delta_percent)}</td><td className="quality-cell">{qualityLabel(feature.properties.quality_status)}</td></tr>)}</tbody></table></div></> : <div className="section-placeholder">{loading ? 'Загрузка сравнительных показателей…' : 'Нет загруженных данных для сравнения. Повторите запрос.'}</div>}
       </section>
 
 

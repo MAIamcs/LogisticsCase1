@@ -3,11 +3,15 @@ import type { ForecastMetadata, ForecastResponse } from '../data/forecast-client
 import { geographyFeatures, geometryLabel } from '../forecast/map-model';
 import { deltaUnitLabel, formatDelta, formatValue, intervalKey, qualityLabel, severityLabels, unitLabel, type CriticalInterval } from '../forecast/presentation';
 
-type Props = { metadata: ForecastMetadata | null; forecast: ForecastResponse | null; selectedId: string; intervals: CriticalInterval[]; onIntervalSelect: (key: string) => void };
+type Props = { metadata: ForecastMetadata | null; forecast: ForecastResponse | null; selectedId: string; districtAsReference?: boolean; intervals: CriticalInterval[]; onIntervalSelect: (key: string) => void };
 
-export function ObjectCard({ metadata, forecast, selectedId, intervals, onIntervalSelect }: Props) {
+export function ObjectCard({ metadata, forecast, selectedId, districtAsReference, intervals, onIntervalSelect }: Props) {
   const object = geographyFeatures(metadata).find(feature => feature.id === selectedId);
   if (!object) return <p className="detail-hint">Выберите объект на карте, в строке или столбце графика либо в таблице. Выбор синхронизирован во всех представлениях.</p>;
+  if (districtAsReference) return <div className="territory-detail object-card" aria-label="Карточка выбранного района">
+    <h3><MapPin size={15} aria-hidden="true" />{object.properties.name}</h3>
+    <p className="detail-hint">Район выделен на карте. Для значений отдельного объекта выберите его на карте или в списке.</p>
+  </div>;
   const properties = forecast?.geojson.features.find(feature => feature.id === selectedId)?.properties;
   const unit = properties ? unitLabel(properties.unit) : '—';
   const associated = intervals.map((interval, index) => ({ interval, key: intervalKey(interval, index) })).filter(item => item.interval.affected_feature_ids.includes(selectedId));

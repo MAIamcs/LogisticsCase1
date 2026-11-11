@@ -51,6 +51,21 @@ describe('real geography and map semantics', () => {
     expect(response.geojson.features.every(feature => feature.geometry.type.includes('LineString'))).toBe(true);
   });
 
+  it.each(['absolute', 'percent'] as const)('renders rising and falling trip demand in red and green (%s)', mode => {
+    const all = series('transport_demand');
+    const definition = metadata.metrics.find(metric => metric.id === 'transport_demand');
+    const scale = changeScale(all, definition, mode);
+    const rendered = renderCollection(all.at(-1)!, mode, scale);
+    const rise = rendered.features.find(feature => feature.properties!.render_change > 0)!;
+    const decline = rendered.features.find(feature => feature.properties!.render_change < 0)!;
+    const channels = (color: string) => color.slice(1).match(/../g)!.map(channel => parseInt(channel, 16));
+    const [riseRed, riseGreen] = channels(rise.properties!.render_color);
+    const [declineRed, declineGreen] = channels(decline.properties!.render_color);
+    expect(riseRed).toBeGreaterThan(riseGreen);
+    expect(declineGreen).toBeGreaterThan(declineRed);
+    expect(changeColor(0, scale)).not.toBe(changeColor(null, scale));
+  });
+
   it('keeps null percentages distinct from observed zero without dropping geometry', () => {
     const response = structuredClone(series('population')[1]);
     const feature = response.geojson.features[0];

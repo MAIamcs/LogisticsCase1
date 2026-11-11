@@ -27,14 +27,14 @@ export function changeScale(series: ForecastResponse[], definition: MetricDefini
   return {
     transportLoad: load,
     tripDemand: demand,
-    zeroColor: demand ? '#c65b60' : '#f1f3f5',
+    zeroColor: demand ? '#778592' : '#f1f3f5',
     positiveMax: Math.max(0, ...values), negativeMax: Math.max(0, ...values.map(value => -value)),
-    positiveLabel: population ? 'Прирост населения' : load ? 'Рост загрузки при усилении перегрузки' : 'Увеличение показателя',
-    negativeLabel: population ? 'Убыль населения' : load ? 'Снижение загрузки' : 'Уменьшение показателя',
+    positiveLabel: population ? 'Прирост населения' : load ? 'Рост загрузки при усилении перегрузки' : demand ? 'Рост спроса на поездки' : 'Увеличение показателя',
+    negativeLabel: population ? 'Убыль населения' : load ? 'Снижение загрузки' : demand ? 'Снижение спроса на поездки' : 'Уменьшение показателя',
     positiveLight: population ? '#d6eadd' : demand ? '#d98589' : load ? '#f5d9d7' : '#d7e7f2',
     positiveDark: population ? '#287b52' : demand ? '#b4232e' : load ? '#b8413d' : '#316e9b',
-    negativeLight: population ? '#e5e2f0' : demand ? '#d997aa' : '#d7e8f3',
-    negativeDark: population ? '#6c5b9b' : demand ? '#892846' : '#306c9b',
+    negativeLight: population ? '#e5e2f0' : demand ? '#8fbb9e' : '#d7e8f3',
+    negativeDark: population ? '#6c5b9b' : demand ? '#287b52' : '#306c9b',
   };
 }
 

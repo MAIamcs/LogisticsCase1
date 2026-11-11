@@ -243,12 +243,13 @@ export function ForecastMap({ metadata, forecast, selectedId, affectedIds, onSel
     const instance = map.current;
     labels.current.forEach((marker, id) => marker.getElement().setAttribute('aria-pressed', String(id === selectedId)));
     if (!instance.getLayer('selected-shape')) return;
-    instance.setPaintProperty('selected-shape', 'line-color', scale.tripDemand ? '#9d1c26' : '#205c84');
+    const selectedColor = scale.tripDemand ? rendered.features.find(feature => feature.id === selectedId)?.properties?.render_color : undefined;
+    instance.setPaintProperty('selected-shape', 'line-color', typeof selectedColor === 'string' ? selectedColor : '#205c84');
     instance.setFilter('selected-shape', ['all', ['!=', ['geometry-type'], 'Point'], ['==', ['get', 'feature_id'], selectedId]]);
     instance.setFilter('selected-point', ['all', point, ['==', ['get', 'feature_id'], selectedId]]);
     instance.setFilter('affected', ['all', ['!=', ['geometry-type'], 'Point'], ['in', ['get', 'feature_id'], ['literal', affectedIds]]]);
     arrangeLabels.current();
-  }, [ready, selectedId, affectedIds, metadata, scale.tripDemand]);
+  }, [ready, selectedId, affectedIds, metadata, scale.tripDemand, rendered]);
 
   useLayoutEffect(() => {
     if (!ready || !map.current) return;
