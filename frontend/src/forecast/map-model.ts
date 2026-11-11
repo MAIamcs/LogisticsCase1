@@ -7,6 +7,8 @@ export type MapCatalog = Pick<ForecastMetadata, 'geography' | 'data_version'>;
 export type MapFeature = ForecastResponse['geojson']['features'][number];
 export type ChangeScale = {
   transportLoad: boolean;
+  tripDemand: boolean;
+  zeroColor: string;
   positiveMax: number; negativeMax: number; positiveLabel: string; negativeLabel: string;
   positiveLight: string; positiveDark: string; negativeLight: string; negativeDark: string;
 };
@@ -21,15 +23,18 @@ export function changeScale(series: ForecastResponse[], definition: MetricDefini
   }));
   const population = definition?.semantic_type === 'population';
   const load = definition?.semantic_type === 'transport_load';
+  const demand = definition?.semantic_type === 'trip_demand';
   return {
     transportLoad: load,
+    tripDemand: demand,
+    zeroColor: demand ? '#c65b60' : '#f1f3f5',
     positiveMax: Math.max(0, ...values), negativeMax: Math.max(0, ...values.map(value => -value)),
     positiveLabel: population ? 'Прирост населения' : load ? 'Рост загрузки при усилении перегрузки' : 'Увеличение показателя',
     negativeLabel: population ? 'Убыль населения' : load ? 'Снижение загрузки' : 'Уменьшение показателя',
-    positiveLight: population ? '#d6eadd' : load ? '#f5d9d7' : '#d7e7f2',
-    positiveDark: population ? '#287b52' : load ? '#b8413d' : '#316e9b',
-    negativeLight: population ? '#e5e2f0' : '#d7e8f3',
-    negativeDark: population ? '#6c5b9b' : '#306c9b',
+    positiveLight: population ? '#d6eadd' : demand ? '#d98589' : load ? '#f5d9d7' : '#d7e7f2',
+    positiveDark: population ? '#287b52' : demand ? '#b4232e' : load ? '#b8413d' : '#316e9b',
+    negativeLight: population ? '#e5e2f0' : demand ? '#d997aa' : '#d7e8f3',
+    negativeDark: population ? '#6c5b9b' : demand ? '#892846' : '#306c9b',
   };
 }
 
@@ -41,7 +46,7 @@ function interpolate(light: string, dark: string, ratio: number): string {
 
 export function changeColor(value: number | null, scale: ChangeScale, feature?: MapFeature): string {
   if (value === null) return '#dfe4e8';
-  if (value === 0) return '#f1f3f5';
+  if (value === 0) return scale.zeroColor;
   if (value > 0 && scale.transportLoad && feature) {
     const { baseline_value: baseline, forecast_value: forecast } = feature.properties;
     // A load ratio above 100% is an excess over capacity, NOT a replacement
