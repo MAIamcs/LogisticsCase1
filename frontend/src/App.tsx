@@ -15,13 +15,13 @@ import './city-workspace.css';
 import { deltaUnitLabel, formatDelta, formatValue, intervalKey, qualityLabel, severityLabels, summaryForSelection, unitLabel } from './forecast/presentation';
 
 export function App() {
-  const [view, setView] = useState<'model' | 'planning'>('model');
+  const [view, setView] = useState<'model' | 'planning'>('planning');
   return <>
     <nav className="workspace-navigation page-width" aria-label="Режим работы">
-      <button type="button" aria-pressed={view === 'model'} onClick={() => setView('model')}>Модель загруженности</button>
       <button type="button" aria-pressed={view === 'planning'} onClick={() => setView('planning')}>Планирование · demo</button>
+      <button type="button" aria-pressed={view === 'model'} onClick={() => setView('model')}>Модель загруженности</button>
     </nav>
-    {view === 'model' ? <CongestionWorkspace onShowPlanning={() => setView('planning')} /> : <PlanningWorkspace />}
+    {view === 'model' ? <CongestionWorkspace /> : <PlanningWorkspace />}
   </>;
 }
 
@@ -49,7 +49,8 @@ function PlanningWorkspace() {
   function selectObject(id: string) {
     const feature = metadata?.geography.boundaries.features.find(item => item.id === id);
     if (feature && definition && selection && !definition.geometry_types.includes(feature.geometry.type)) {
-      const compatible = metadata?.metrics.find(metric => metric.geometry_types.includes(feature.geometry.type));
+      const compatible = metadata?.metrics.find(metric => metric.semantic_type === 'transport_load' && metric.geometry_types.includes(feature.geometry.type))
+        ?? metadata?.metrics.find(metric => metric.geometry_types.includes(feature.geometry.type));
       if (compatible) workspace.setSelection({ ...selection, metric: compatible.id });
     }
     setSelectedId(id);

@@ -157,7 +157,7 @@ date. Base values, IDs and boundaries stay identical across scenarios and
 years. All 30 parameter combinations plus metadata and geography are generated under
 `contracts/fixtures/forecast/`, read directly by FastAPI, and copied by the
 frontend build to `public/demo/forecast/`. CI rejects stale or extra fixtures.
-Demo versions are `demo-linear-v3` and `synthetic-nsk-2026.1`. Full examples are
+Demo versions are `demo-linear-v3` and `synthetic-nsk-2026.2`. Full examples are
 the generated JSON files, which are validated against the exported schemas.
 
 ## Errors and health

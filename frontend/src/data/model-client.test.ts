@@ -53,18 +53,21 @@ describe('CatBoost model transport', () => {
     expect(result.hourly_profile.map(point => point.hour)).toEqual(Array.from({ length: 24 }, (_, hour) => hour));
   });
 
-  it('loads schema-validated saved predictions in Pages mode without API calls', async () => {
+  it('calculates new parameter combinations in Pages mode and reuses the downloaded model', async () => {
     const storedMetadata = JSON.parse(readFileSync(new URL('../../../contracts/fixtures/model/metadata.json', import.meta.url), 'utf8'));
-    const records = JSON.parse(readFileSync(new URL('../../../contracts/fixtures/model/predictions.json', import.meta.url), 'utf8'));
-    const fetcher = vi.fn<typeof fetch>(url => json(String(url).endsWith('metadata.json') ? storedMetadata : records));
+    const artifact = JSON.parse(readFileSync(new URL('../../../contracts/fixtures/model/browser-model.json', import.meta.url), 'utf8'));
+    const probe = JSON.parse(readFileSync(new URL('../../../backend/tests/fixtures/browser-inference-parity.json', import.meta.url), 'utf8')).rows[0];
+    const fetcher = vi.fn<typeof fetch>(url => json(String(url).endsWith('metadata.json') ? storedMetadata : artifact));
     const client = createModelClient({ BASE_URL: '/LogisticsCase1/', VITE_DATA_MODE: 'demo' }, fetcher);
     const catalog = await client.getMetadata();
-    for (const record of records) expect(validateModelPrediction(record)).toBe(true);
-    const input = { ...records[0].features, hour: 12 };
-    const result = await client.predict(input, catalog);
-    expect(result.prediction.value).toBe(records[0].hourly_profile[12].value);
+    const result = await client.predict(probe.features, catalog);
+    expect(result.prediction.value).toBeCloseTo(probe.expected, 10);
+    expect(result.warnings.some(warning => warning.includes('отличаются от профиля'))).toBe(true);
+    const otherHour = (probe.features.hour + 1) % 24;
+    const next = await client.predict({ ...probe.features, hour: otherHour }, catalog);
+    expect(next.prediction.value).toBeCloseTo(result.hourly_profile[otherHour].value, 10);
     expect(fetcher.mock.calls.every(([url]) => String(url).startsWith('/LogisticsCase1/demo/model/'))).toBe(true);
-    await expect(client.predict({ ...input, population: 1 }, catalog)).rejects.toThrow('нет сохранённого');
+    expect(fetcher.mock.calls.filter(([url]) => String(url).includes('browser-model.json'))).toHaveLength(1);
   });
 
   it('surfaces API failure without substituting static data', async () => {

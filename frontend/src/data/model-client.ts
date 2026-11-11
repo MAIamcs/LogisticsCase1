@@ -2,7 +2,9 @@ import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 import metadataSchema from '../../../contracts/schemas/model-metadata-response.json';
 import predictionSchema from '../../../contracts/schemas/model-prediction-response.json';
+import districtProfiles from '../../../contracts/model-profiles.json';
 import type { components } from '../../../contracts/api.generated';
+import { predictBrowserModel, type BrowserModel } from '../model/browser-inference';
 import { readConfiguration, type Environment } from './config';
 import { createForecastClient } from './forecast-client';
 
@@ -40,7 +42,6 @@ export function createModelClient(env: Environment, fetcher: typeof fetch = fetc
   const config = readConfiguration(env);
   const geography = createForecastClient(env, fetcher);
   async function read<T extends object>(path: string, validate: (value: unknown) => value is T, signal?: AbortSignal, body?: object): Promise<T> {
-    if (config.mode !== 'api') throw new ModelDataError('Запуск CatBoost доступен в режиме API. Статическая демонстрация не выполняет модель.');
     const timeout = AbortSignal.timeout(15000);
     let response: Response;
     try {
@@ -64,9 +65,34 @@ export function createModelClient(env: Environment, fetcher: typeof fetch = fetc
   }
 
   async function staticJson(path: string, signal?: AbortSignal): Promise<unknown> {
-    const response = await fetcher(`${env.BASE_URL || '/'}demo/model/${path}`, { signal });
-    if (!response.ok) throw new ModelDataError('Не удалось загрузить сохранённые результаты модели. Повторите запрос.');
-    return response.json();
+    const timeout = AbortSignal.timeout(15000);
+    try {
+      const response = await fetcher(`${env.BASE_URL || '/'}demo/model/${path}`, { signal: signal ? AbortSignal.any([signal, timeout]) : timeout });
+      if (!response.ok) throw new ModelDataError(`HTTP ${response.status}`, response.status);
+      return await response.json();
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      throw new ModelDataError('Не удалось загрузить файл модели. Повторите запрос.');
+    }
+  }
+
+  // The model is shared by every parameter choice. Cancelled computations do
+  // not cancel the shared download, and a failed download can be retried.
+  let browserModel: { sha: string; request: Promise<BrowserModel> } | undefined;
+  function loadBrowserModel(sha: string) {
+    if (browserModel?.sha === sha) return browserModel.request;
+    const request = staticJson(`browser-model.json?v=${encodeURIComponent(sha)}`).then(value => {
+      if (!value || typeof value !== 'object' || !('data' in value) || !('categorical_hashes' in value)) {
+        throw new ModelDataError('Некорректный файл модели.');
+      }
+      if (!('model_sha256' in value) || value.model_sha256 !== sha) throw new ModelDataError('Версия файла модели не соответствует метаданным. Повторите запрос.');
+      return value as BrowserModel;
+    }).catch(error => {
+      if (browserModel?.request === request) browserModel = undefined;
+      throw error;
+    });
+    browserModel = { sha, request };
+    return request;
   }
   return {
     mode: config.mode,
@@ -85,13 +111,10 @@ export function createModelClient(env: Environment, fetcher: typeof fetch = fetc
       if (metadata.status !== 'ready') throw new ModelDataError(metadata.unavailable_reason || 'Модель временно недоступна.', 503);
       let result: ModelPredictionResponse;
       if (config.mode === 'demo') {
-        const records = await staticJson('predictions.json', signal);
-        if (!Array.isArray(records)) throw new ModelDataError('Некорректные результаты модели.');
-        const saved = records.find(row => validateModelPrediction(row) && modelFeatureNames.filter(name => name !== 'hour').every(name => row.features[name] === features[name]));
-        if (!saved || !validateModelPrediction(saved)) throw new ModelDataError('Для этой комбинации нет сохранённого расчёта. Используйте профиль обучающего набора или подключите API.');
-        const point = saved.hourly_profile.find(point => point.hour === features.hour);
-        if (!point) throw new ModelDataError('Нет расчёта выбранного часа.');
-        result = { ...saved, features, prediction: { value: point.value, unit: 'балл', out_of_expected_range: point.value < 0 || point.value > 10 } };
+        const artifact = await loadBrowserModel(metadata.model_sha256);
+        signal?.throwIfAborted();
+        result = predictBrowserModel(artifact, features, metadata);
+        if (!validateModelPrediction(result)) throw new ModelDataError('Результат модели не соответствует контракту 1.0.');
       } else result = await read('/api/v1/model/predict', validateModelPrediction, signal, { features, include_hourly_profile: true });
       if (result.model_version !== metadata.model_version || result.target.id !== metadata.target.id || result.target.unit !== metadata.target.unit
         || result.feature_id !== metadata.districts.find(district => district.name === features.district)?.feature_id
@@ -102,6 +125,10 @@ export function createModelClient(env: Environment, fetcher: typeof fetch = fetc
       if (profile.length !== 24 || profile.some((point, index) => point.hour !== index)
         || Math.abs(profile[features.hour].value - result.prediction.value) > 1e-9 * Math.max(1, Math.abs(result.prediction.value))) {
         throw new ModelDataError('Почасовой профиль модели неполон или не соответствует выбранному часу.');
+      }
+      const training = districtProfiles[features.district];
+      if (training && (training.is_main_road !== features.is_main_road || training.lanes_total !== features.lanes_total || training.population !== features.population)) {
+        return { ...result, warnings: ['Тип дороги, полосность или население отличаются от профиля этого района в обучающем наборе. Точность для этих параметров не проверена.', ...result.warnings] };
       }
       return result;
     },

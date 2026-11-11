@@ -9,7 +9,7 @@ export function useCongestionModel() {
   });
   const [metadata, setMetadata] = useState<ModelMetadata | null>(null);
   const [result, setResult] = useState<ModelPredictionResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(setup.client));
   const [predicting, setPredicting] = useState(false);
   const [error, setError] = useState(setup.error);
   const [revision, setRevision] = useState(0);

@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DIRECTORY = ROOT / "contracts" / "geography"
 RETRIEVED_AT = "2026-11-09"
-GEOGRAPHY_VERSION = "nsk-geography-2026-11-09"
+GEOGRAPHY_VERSION = "nsk-geography-2026-11-11"
 DISTRICT_URL = "https://maps.nso.ru/arcgis2/rest/services/Common/Boundary/MapServer/7"
 DISTRICT_QUERY = DISTRICT_URL + "/query?where=1%3D1&outFields=*&outSR=4326&f=json"
 OSM_EXTRACT = "https://builder.osmand.net/osm-extract/russia_novosibirsk_asia/russia_novosibirsk_asia.pbf"
@@ -160,9 +160,12 @@ def extract_osm(path: Path) -> dict:
 
 
 def outputs(snapshot: dict) -> dict[str, bytes]:
+    from build_bus_routes import artifacts as bus_artifacts
+
     result = {"districts.geojson": encoded(districts())}
     for name, layer in snapshot["layers"].items():
         result[name + ".geojson"] = encoded(layer)
+    result.update(bus_artifacts())
     sources = [{
         "id": "nso-boundary", "name": "Геопортал Новосибирской области — Границы районов г. Новосибирск",
         "url": DISTRICT_URL, "query_url": DISTRICT_QUERY,
@@ -180,16 +183,19 @@ def outputs(snapshot: dict) -> dict[str, bytes]:
     details = {
         "districts": ("Районы", "nso-boundary", ["Polygon", "MultiPolygon"], "10 районов города; исходные контуры областного GIS без упрощения."),
         "roads": ("Дороги", "osm", ["LineString", "MultiLineString"], "Автомобильные дороги OpenStreetMap; класс дороги передан в kind."),
+        "bus-routes": ("Автобусные маршруты", "osm", ["LineString"], "Связные цепочки дорожных участков из автобусных отношений OpenStreetMap."),
+        "bus-corridors": ("Коридоры планирования", "osm", ["LineString"], "Пять полных направлений маршрутов для демонстрационных показателей."),
         "buildings": ("Здания", "osm", ["Polygon", "MultiPolygon"], "Контуры зданий OpenStreetMap во всём охвате города; не кадастровые сведения."),
         "water": ("Реки и водоёмы", "osm", ["Polygon", "MultiPolygon", "LineString", "MultiLineString"], "Реки, ручьи, каналы, водоёмы OpenStreetMap; обрезаны по охвату фоновых слоёв."),
         "stops": ("Станции", "osm", ["Point"], "Имеющиеся в OpenStreetMap железнодорожные станции и станции метро; не полный реестр остановок."),
     }
     layer_descriptors = []
     for identifier, (name, source_id, geometry_types, description) in details.items():
-        data = json.loads(result[identifier + ".geojson"])
-        layer_descriptors.append({"id": identifier, "name": name, "file": identifier + ".geojson", "source_id": source_id,
+        filename = identifier.replace("-", "_") + ".geojson"
+        data = json.loads(result[filename])
+        layer_descriptors.append({"id": identifier, "name": name, "file": filename, "source_id": source_id,
             "geometry_types": geometry_types, "feature_count": len(data["features"]), "description": description,
-            "sha256": hashlib.sha256(result[identifier + ".geojson"]).hexdigest()})
+            "sha256": hashlib.sha256(result[filename]).hexdigest()})
     result["manifest.json"] = encoded({"geography_version": GEOGRAPHY_VERSION, "retrieved_at": RETRIEVED_AT,
         "is_synthetic": False, "bbox": list(CONTEXT_BBOX), "sources": sources, "layers": layer_descriptors})
     return result

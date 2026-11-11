@@ -5,7 +5,7 @@
   "metric": "population",
   "scenario": "baseline",
   "model_version": "demo-linear-v3",
-  "data_version": "synthetic-nsk-2026.1",
+  "data_version": "synthetic-nsk-2026.2",
   "is_demo": true,
   "disclaimer": "Географические объекты взяты из указанных картографических источников. Численные показатели и критические интервалы — синтетическая демонстрация, не фактическая статистика и не аналитический прогноз. Аналитическая модель не подключена.",
   "geojson": {

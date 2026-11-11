@@ -16,7 +16,7 @@ for r in rows:
 (root/'contracts/model-profiles.json').write_text(json.dumps(profiles,ensure_ascii=False,indent=2)+'\n')
 folder=root/'contracts/fixtures/model';folder.mkdir(exist_ok=True)
 model=CongestionModel();metadata=model.metadata(DemoForecastProvider().get_metadata().geography)
-metadata.disclaimer='Предварительно рассчитанные результаты предоставленной CatBoost по профилям обучающего CSV. Год не входит в модель; это не прогноз на 2030 год.'
+metadata.disclaimer='Расчётный индекс дорожного профиля CatBoost. Модель использует час, район, тип дороги, день недели, сезон, полосность и население.'
 metadata.season_suggestions=sorted({r['season'] for r in rows})
 next(f for f in metadata.features if f.name=='season').options=metadata.season_suggestions
 results=[]

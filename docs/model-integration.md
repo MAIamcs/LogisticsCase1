@@ -1,19 +1,20 @@
-# Обновление: обучающие профили и Pages
+# Модель загруженности CatBoost
 
-Обучающий CSV хранится локально в игнорируемом `contracts/model-training.csv` и не публикуется: 3360 строк, все 10 районов,
-2 сезона, 7 дней, 24 часа. В каждом районе один профиль главной дороги.
-`python scripts/export_model_predictions.py` выполняет только инференс готовой CBM,
-проверяет входы и создаёт 140 суточных профилей для Pages, метаданные и provenance.
-Значения берутся из CatBoost, не из столбца целевых меток CSV. Пропуски не создаются.
-Pages читает сохранённые результаты с тем же контрактом, API считает произвольные
-полные входы. Неизвестные комбинации в статическом режиме явно отклоняются.
-Это оценка расчётного индекса профиля, а не измерение всех дорог района и не годовой прогноз.
-При выборе района население и полосность подставляются из CSV. Геометрия улиц
-в демонстрации объединяет все одноимённые части из сохранённого OSM-снимка.
+На GitHub Pages расчёт выполняется в браузере по деревьям предоставленной CatBoost.
+При изменении параметров вычисляются выбранный час и суточный профиль.
+Экспорт создаёт `contracts/fixtures/model/browser-model.json` из существующей CBM.
+Словарь категорий формируется по названиям районов, дней недели и сезонов.
+Для обновления экспорта запустите `python scripts/export_browser_model.py`.
 
-Предыдущие сведения ниже о недоступности CSV относятся к первой версии интеграции.
+Выбор района заполняет профиль из обучающего набора. Все семь признаков можно
+редактировать в форме. При изменении полосности, типа дороги или населения
+относительно обучающего профиля интерфейс отмечает область применимости расчёта.
+Сохранённые 140 суточных профилей служат проверочными примерами для сопоставления
+браузерного расчёта с CBM. `python scripts/export_model_predictions.py` обновляет
+эти примеры и метаданные из локального `contracts/model-training.csv`.
+Структура обучающей выборки описана в [аудите набора](training-data-audit.md).
 
-# Existing CatBoost model: local inference
+## Local inference and API
 
 The application can run the supplied `catboost_congestion.cbm` without training
 or executing `analyzer.ipynb`. The model predicts `congestion_index_0_10`, a
@@ -63,16 +64,12 @@ cd frontend
 pnpm dev
 ```
 
-The model view requires API mode and the separate running FastAPI service.
-GitHub Pages can host the static frontend; these local commands do not deploy
-a public backend. A frontend opened on another computer cannot reach this
-computer's API through its own `127.0.0.1`.
+Use these settings for live FastAPI inference. The default Pages build uses browser inference. A production frontend configured for API mode needs a separately deployed HTTPS backend.
 
 ## Required input
 
 Every prediction requires all seven raw fields. The API and CLI share
-`ModelFeatures` validation. No population, lane count, or other district default
-is inferred from the geographic boundaries or synthetic forecast fixtures.
+`ModelFeatures` validation. The form initializes population and lane count from the corresponding district profile in the supplied training CSV.
 
 | Field | Meaning |
 | --- | --- |
@@ -84,9 +81,7 @@ is inferred from the geographic boundaries or synthetic forecast fixtures.
 | `lanes_total` | Explicit integer total lane count, at least 1. |
 | `population` | Explicit nonnegative integer population input for the selected configuration. |
 
-`Лето` and `Не лето` are suggested season spellings for manual entry; they
-have not been verified against the missing source CSV. A model can accept an
-unseen category without proving that the category was present during training.
+The training CSV contains the season categories `Лето` and `Не лето`. The model form offers these categories.
 
 The adapter retains those fields and adds `hour_sin`, `hour_cos`, `dow_sin`, and
 `dow_cos`, matching the notebook's cyclic transformations. Categorical indices
@@ -95,8 +90,7 @@ are `[1, 3, 4]` in the verified 11-feature model. In particular,
 missing or non-finite numerical inputs are rejected rather than imputed.
 Integer inputs are limited to JavaScript's maximum safe integer
 `9007199254740991` for consistent JSON exchange; this is not a learned feature
-range. The actual population/lane training ranges are not recoverable without
-the source CSV and are not claimed to have been validated.
+range. The training set uses 4, 6 and 8 lanes and population values from 64,972 to 303,500, with one profile per district.
 
 The following complete example is **illustrative only**. Its population, lanes,
 road flag and season are not recovered training values or district defaults.
@@ -172,9 +166,7 @@ must differ from the input file. Errors go to stderr with exit status 2.
 The supplied binary was checked on Python 3.12 with CatBoost 1.2.10 using
 5,040 completely specified synthetic configurations: all 24 hours, ten district
 labels, seven weekdays and three explicit season strings (`Лето`, `Не лето`,
-`Зима`), with population 100000, four lanes and main-road flag 1. These are test
-inputs, not recovered training profiles or application defaults; the season
-strings remain unverified training categories.
+`Зима`), with population 100000, four lanes and main-road flag 1. These inputs were chosen for inference parity testing. The supplied training CSV confirms `Лето` and `Не лето`.
 
 The adapter's `math.sin/cos` features matched an independent reconstruction of
 the notebook's NumPy transformations exactly in this environment. Both feature
@@ -199,10 +191,9 @@ the best held-out RMSE of 0.2190812584. These are results of the supplied traini
 run, not newly reproduced accuracy estimates. They do not establish long-term
 forecast accuracy or causal effects from changing population or lanes.
 
-`novosibirsk_ml_dataset_final_8columns.csv` was not supplied with the available
-artifacts. The notebook does not print the district input configurations, and
-the CBM's split thresholds and category hashes do not recover those original
-rows. A district-wide forecast therefore needs sourced configurations first.
+The supplied training CSV covers one main-road profile in each of the ten districts.
+The source CSV is retained locally, and the repository contains the district
+profiles and inference artifacts used for serving and parity checks.
 
 There is no year or scenario identifier among the trained inputs. Identical
 seven-field inputs produce identical results regardless of a year selection.

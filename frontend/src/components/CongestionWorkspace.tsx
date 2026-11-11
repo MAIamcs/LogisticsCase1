@@ -24,7 +24,7 @@ type FormProps = {
 export function CongestionForm({ metadata, draft, onChange, onSubmit, predicting }: FormProps) {
   function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); onSubmit(); }
   return <form className="congestion-form" onSubmit={submit}>
-    <div className="congestion-form-heading"><h3>Параметры дороги и времени</h3><p>Начальные час и день — выбор интерфейса. Введите характеристики вашего объекта и сезон.</p></div>
+    <div className="congestion-form-heading"><h3>Параметры дороги и времени</h3><p>Выбор района заполняет исходный профиль. Параметры можно изменить.</p></div>
     {modelFeatureNames.map(name => {
       const feature = metadata.features.find(item => item.name === name)!;
       const update = (value: string) => onChange({ ...draft, [name]: value });
@@ -42,8 +42,8 @@ export function CongestionForm({ metadata, draft, onChange, onSubmit, predicting
           onChange={event => update(event.target.value)} />;
       }
       return <label className="control-field" key={name}>{feature.label}{control}
-        {name === 'season' && <small id="model-season-help">Подсказки можно изменить. В обучении используются «Лето» и «Не лето».</small>}
-        {name === 'population' && <small id="model-population-help">Укажите население для вашего профиля. Значение из обучающего профиля можно изменить в режиме API.</small>}
+        {name === 'season' && <small id="model-season-help">Категории обучающего набора: «Лето» и «Не лето».</small>}
+        {name === 'population' && <small id="model-population-help">Численность населения района в выбранном сценарии расчёта.</small>}
       </label>;
     })}
     <datalist id="model-season-suggestions">{metadata.season_suggestions.map(season => <option key={season} value={season} />)}</datalist>
@@ -79,7 +79,7 @@ export function HourlyProfileChart({ result }: { result: ModelPredictionResponse
   </figure>;
 }
 
-export function CongestionWorkspace({ onShowPlanning }: { onShowPlanning: () => void }) {
+export function CongestionWorkspace() {
   const model = useCongestionModel();
   const { metadata, result, loading, predicting, error } = model;
   const [draft, setDraft] = useState<ModelDraft | null>(null);
@@ -116,7 +116,7 @@ export function CongestionWorkspace({ onShowPlanning }: { onShowPlanning: () => 
     <header className="page-header page-width"><div className="project-label"><Route size={18} aria-hidden="true" /><span>Новосибирск · CatBoost</span></div><h1>Модель загруженности дорог</h1></header>
     <main id="model-main" className="page-width model-main" tabIndex={-1}>
       <p className="model-intro">Оценка загруженности для одного профиля дороги по семи введённым признакам. Результат выражен в баллах с ожидаемым диапазоном 0–10.</p>
-      {isStatic && <p className="model-intro">Сохранённые расчёты CatBoost по обучающим профилям 10 районов. Для произвольных параметров нужен API.</p>}
+      {isStatic && <p className="model-intro">CatBoost рассчитывает индекс в браузере после изменения параметров.</p>}
       <div className="request-state" role="status" aria-live="polite">{loading ? 'Загрузка описания модели…' : predicting ? 'Вычисление оценки и почасового профиля…' : result ? 'Результат модели загружен для выбранных параметров.' : metadata?.status === 'ready' ? 'Модель готова. Заполните параметры и запустите расчёт.' : unavailable ? 'Модель недоступна.' : ''}</div>
       {(error || formError) && <div className="error-box" role="alert"><AlertCircle size={20} aria-hidden="true" /><div><strong>Расчёт не выполнен</strong><p>{formError || error}</p>{!metadata && model.canReload && <button type="button" onClick={model.reload}>Повторить загрузку</button>}</div></div>}
       {unavailable && <section className="model-status-panel" aria-labelledby="unavailable-model-heading"><h2 id="unavailable-model-heading">Сервис модели не готов</h2><p>{metadata.unavailable_reason || 'Обученный файл модели недоступен. Повторите загрузку позднее.'}</p><button type="button" onClick={model.reload}>Проверить доступность</button></section>}

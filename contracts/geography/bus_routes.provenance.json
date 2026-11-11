@@ -1,0 +1,42 @@
+{
+  "source": "OpenStreetMap bus route relations and their ordered traveled member ways",
+  "source_url": "https://builder.osmand.net/osm-extract/russia_novosibirsk_asia/russia_novosibirsk_asia.pbf",
+  "pbf_sha256": "f4b91aaf673d32904fbbce902a2c069fcc5479f439109728624b68289e42cb47",
+  "source_snapshot_retrieved": "2026-11-09",
+  "service_validity_date": null,
+  "license": "ODbL-1.0",
+  "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "attribution": "© OpenStreetMap contributors",
+  "attribution_url": "https://www.openstreetmap.org/copyright",
+  "source_file": "source/osm-bus-route-members.json.gz",
+  "source_sha256": "1275b9046c0e21615a29b62dbddac51925255ff42e6f73f1b44e7fc0f1755438",
+  "bus_relation_count": 105,
+  "connected_chain_count": 559,
+  "reference_corridor_count": 5,
+  "disconnected_relation_count": 37,
+  "geometry_rule": "Merge only consecutive source member ways sharing an exact endpoint. Reverse a piece only when its endpoint exactly matches. Preserve every source edge. Never bridge gaps.",
+  "supplied_road_match_rule": "Use supplied geometry only when OSM way ID and the full ordered vertex sequence match the retained OSM member, allowing reversal. Other ways retain their original OSM geometry.",
+  "supplied_road_input": {
+    "input_file": "novosibirsk_roads.csv",
+    "input_sha256": "a86a509f5c354ba4cff3c54d9207ec9e00ef51fc00aae9ca00d654aca5810725",
+    "input_road_count": 1642,
+    "matching_road_count": 655,
+    "same_osm_id_different_geometry_count": 6
+  },
+  "matched_roads_source_file": "source/osm-bus-road-matches.json.gz",
+  "matched_roads_source_sha256": "d05af37c94b26f4edf5150e3c6a3f19abc92816f21c621d2422ae61461b90fea",
+  "matched_member_occurrences": 2922,
+  "source_member_occurrences": 6125,
+  "scope": "Snapshot route geometry, not live service, a full routing graph, measured traffic or model labels. Reference corridors are not identified training roads.",
+  "official_transit_map_data_used": false,
+  "assets": {
+    "bus_routes.geojson": {
+      "sha256": "53df204f46ff43eb81e9c9ef2d1400d54e8be70adf7b68055edd871572daf4aa",
+      "bytes": 1322021
+    },
+    "bus_corridors.geojson": {
+      "sha256": "5104730da68612ae72e33c801bba791bc5b44956cf27571b3f3cd74050585bb6",
+      "bytes": 57748
+    }
+  }
+}

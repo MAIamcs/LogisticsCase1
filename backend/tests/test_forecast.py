@@ -32,7 +32,7 @@ def test_metadata_uses_data_base_year_and_declares_geography(client):
     assert metadata == json.loads((DEFAULT_DEMO_DIRECTORY / "metadata.json").read_text())
     assert metadata["base_year"] == SOURCE["base_year"] == 2026
     assert metadata["available_years"] == list(range(2026, 2031))
-    assert metadata["data_version"] == "synthetic-nsk-2026.1"
+    assert metadata["data_version"] == SOURCE["data_version"]
     assert metadata["is_demo"] is True
     assert all(set(metric) == {"id", "name", "unit", "description", "aggregation", "semantic_type", "geometry_types"} for metric in metadata["metrics"])
     assert metadata["geography"]["crs"] == "EPSG:4326"

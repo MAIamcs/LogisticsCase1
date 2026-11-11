@@ -16,6 +16,7 @@ const empty: FeatureCollection = { type: 'FeatureCollection', features: [] };
 const polygon: ExpressionSpecification = ['==', ['geometry-type'], 'Polygon'];
 const line: ExpressionSpecification = ['==', ['geometry-type'], 'LineString'];
 const point: ExpressionSpecification = ['==', ['geometry-type'], 'Point'];
+const corridorWidth: ExpressionSpecification = ['interpolate', ['linear'], ['zoom'], 8, 1.5, 12, 2.5, 16, 4];
 const analyticalLayers = ['forecast-zones', 'forecast-sections', 'forecast-points', 'forecast-undefined'];
 const districtLayers = ['district-outline'];
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!);
@@ -45,7 +46,8 @@ function addContext(instance: LibreMap, descriptor: GeographyLayer) {
   }
   if (descriptor.geometry_types.some(type => type.includes('LineString'))) {
     const water = descriptor.id === 'water';
-    if (!water) {
+    const busRoute = descriptor.id === 'bus-routes';
+    if (!water && !busRoute) {
       const halo = `${source}-halo`;
       if (!instance.getLayer(halo)) instance.addLayer({ id: halo, type: 'line', source, filter: line,
         layout: { 'line-cap': 'round', 'line-join': 'round' },
@@ -55,7 +57,10 @@ function addContext(instance: LibreMap, descriptor: GeographyLayer) {
     const id = `${source}-line`;
     if (!instance.getLayer(id)) instance.addLayer({ id, type: 'line', source, filter: line,
       layout: { 'line-cap': 'round', 'line-join': 'round' },
-      paint: { 'line-color': water ? '#a4cbdc' : '#ffffff', 'line-width': ['interpolate', ['linear'], ['zoom'], 9, water ? 1 : .6, 13, water ? 3 : 2, 16, water ? 7 : 6] } }, before);
+      paint: { 'line-color': water ? '#a4cbdc' : busRoute ? '#7897a8' : '#ffffff',
+        'line-width': busRoute ? ['interpolate', ['linear'], ['zoom'], 8, .55, 12, 1, 16, 1.8]
+          : ['interpolate', ['linear'], ['zoom'], 9, water ? 1 : .6, 13, water ? 3 : 2, 16, water ? 7 : 6],
+        'line-opacity': busRoute ? .48 : 1 } }, before);
     layers.push(id);
   }
   if (descriptor.geometry_types.includes('Point')) {
@@ -125,16 +130,17 @@ export function ForecastMap({ metadata, forecast, selectedId, affectedIds, onSel
       instance.addLayer({ id: 'forecast-zones', type: 'fill', source: 'forecast', filter: polygon, paint: { 'fill-color': ['get', 'render_color'], 'fill-opacity': .28 } });
       instance.addLayer({ id: 'forecast-zone-outline', type: 'line', source: 'forecast', filter: polygon, paint: { 'line-color': '#839aa9', 'line-width': .7 } });
       instance.addLayer({ id: 'district-outline', type: 'line', source: 'catalog', filter: polygon, paint: { 'line-color': '#657e90', 'line-width': 1, 'line-dasharray': [4, 2] } });
-      instance.addLayer({ id: 'forecast-sections', type: 'line', source: 'forecast', filter: line, layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['get', 'render_color'], 'line-width': ['interpolate', ['linear'], ['zoom'], 8, 5, 12, 7, 16, 12] } });
+      instance.addLayer({ id: 'forecast-sections', type: 'line', source: 'forecast', filter: line, layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['get', 'render_color'], 'line-width': corridorWidth } });
       instance.addLayer({ id: 'forecast-undefined', type: 'line', source: 'forecast', filter: ['all', ['!=', ['geometry-type'], 'Point'], ['==', ['get', 'render_change'], null]], paint: { 'line-color': '#7c868d', 'line-width': 1.5, 'line-dasharray': [2, 2] } });
       instance.addLayer({ id: 'stops', type: 'circle', source: 'catalog', filter: point, paint: { 'circle-radius': 4, 'circle-color': '#fff', 'circle-stroke-color': '#47687e', 'circle-stroke-width': 1.5 } });
       instance.addLayer({ id: 'forecast-points', type: 'circle', source: 'forecast', filter: point, paint: { 'circle-radius': 5, 'circle-color': ['get', 'render_color'], 'circle-stroke-color': '#3e566b', 'circle-stroke-width': 1 } });
       instance.addLayer({ id: 'affected', type: 'line', source: 'catalog', filter: ['==', ['get', 'feature_id'], ''], paint: { 'line-color': '#b54245', 'line-width': 3, 'line-dasharray': [3, 2] } });
-      instance.addLayer({ id: 'selected-shape', type: 'line', source: 'catalog', filter: ['==', ['get', 'feature_id'], ''], paint: { 'line-color': '#205c84', 'line-width': 3 } });
+      instance.addLayer({ id: 'selected-shape', type: 'line', source: 'catalog', filter: ['==', ['get', 'feature_id'], ''], paint: { 'line-color': '#205c84', 'line-width': ['interpolate', ['linear'], ['zoom'], 8, 2, 16, 4.5] } });
       instance.addLayer({ id: 'selected-point', type: 'circle', source: 'catalog', filter: ['==', ['get', 'feature_id'], ''], paint: { 'circle-radius': 8, 'circle-color': '#205c84', 'circle-opacity': .25, 'circle-stroke-color': '#205c84', 'circle-stroke-width': 2 } });
+      instance.addLayer({ id: 'corridor-hit', type: 'line', source: 'catalog', filter: line, paint: { 'line-width': 12, 'line-opacity': 0 } });
       instance.addLayer({ id: 'section-hit', type: 'line', source: 'forecast', filter: line, paint: { 'line-width': 16, 'line-opacity': 0 } });
       instance.addLayer({ id: 'stop-hit', type: 'circle', source: 'catalog', filter: point, paint: { 'circle-radius': 12, 'circle-opacity': 0 } });
-      const hits = ['stop-hit', 'section-hit', 'forecast-zones', 'district-fill'];
+      const hits = ['stop-hit', 'section-hit', 'corridor-hit', 'forecast-zones', 'district-fill'];
       instance.on('click', event => {
         if (event.originalEvent.target instanceof Element && event.originalEvent.target.closest('button, a, summary')) return;
         const hit = instance.queryRenderedFeatures(event.point, { layers: hits })[0];
@@ -188,7 +194,7 @@ export function ForecastMap({ metadata, forecast, selectedId, affectedIds, onSel
     });
     setFailedLayers([]); setPendingLayers([]);
     if (!metadata || !loadLayer) return;
-    const order: Record<string, number> = { water: 0, buildings: 1, roads: 2, stops: 3 };
+    const order: Record<string, number> = { water: 0, buildings: 1, roads: 2, 'bus-routes': 3, stops: 4 };
     const layers = [...(metadata.geography.layers ?? [])].sort((a, b) => (order[a.id] ?? 2) - (order[b.id] ?? 2));
     for (const descriptor of layers) {
       const { source, layers: ids } = addContext(instance, descriptor); context.current.set(descriptor.id, ids);
@@ -248,6 +254,7 @@ export function ForecastMap({ metadata, forecast, selectedId, affectedIds, onSel
     const instance = map.current;
     const set = (ids: string[], enabled: boolean) => ids.forEach(id => { if (instance.getLayer(id)) instance.setLayoutProperty(id, 'visibility', enabled ? 'visible' : 'none'); });
     set(analyticalLayers, visibility.forecast !== false); set(['section-hit'], visibility.forecast !== false);
+    set(['corridor-hit'], visibility['bus-routes'] !== false);
     set(['forecast-zone-outline'], visibility.forecast !== false && visibility.districts !== false);
     set(districtLayers, visibility.districts !== false); set(['stops', 'stop-hit'], visibility.stops !== false);
     context.current.forEach((ids, id) => set(ids, visibility[id] !== false));

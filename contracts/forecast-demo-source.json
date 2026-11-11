@@ -7,7 +7,7 @@
     2029,
     2030
   ],
-  "data_version": "synthetic-nsk-2026.1",
+  "data_version": "synthetic-nsk-2026.2",
   "model_version": "demo-linear-v3",
   "disclaimer": "Географические объекты взяты из указанных картографических источников. Численные показатели и критические интервалы — синтетическая демонстрация, не фактическая статистика и не аналитический прогноз. Аналитическая модель не подключена.",
   "metrics": [
@@ -184,9 +184,9 @@
       "missing_years": {}
     },
     {
-      "feature_id": "osm-way-80223228",
-      "name": "Красный проспект",
-      "geometry_id": "osm-way-80223228",
+      "feature_id": "osm-bus-18674224-chain-0",
+      "name": "Автобус 5: посёлок Северный → улица Дюканова",
+      "geometry_id": "osm-bus-18674224-chain-0",
       "anchor_values": {
         "transport_demand": 60000,
         "infrastructure_load": 100
@@ -198,9 +198,9 @@
       "missing_years": {}
     },
     {
-      "feature_id": "osm-way-27495156",
-      "name": "улица Кирова",
-      "geometry_id": "osm-way-27495156",
+      "feature_id": "osm-bus-1694925-chain-0",
+      "name": "Автобус 8: вокзал «Новосибирск-Главный» - Цветной проезд",
+      "geometry_id": "osm-bus-1694925-chain-0",
       "anchor_values": {
         "transport_demand": 24000,
         "infrastructure_load": 65
@@ -212,9 +212,9 @@
       "missing_years": {}
     },
     {
-      "feature_id": "osm-way-1020600225",
-      "name": "улица Титова",
-      "geometry_id": "osm-way-1020600225",
+      "feature_id": "osm-bus-13758152-chain-0",
+      "name": "Автобус 20: Мега - улица Твардовского",
+      "geometry_id": "osm-bus-13758152-chain-0",
       "anchor_values": {
         "transport_demand": 45000,
         "infrastructure_load": 72
@@ -226,9 +226,9 @@
       "missing_years": {}
     },
     {
-      "feature_id": "osm-way-93057745",
-      "name": "Бердское шоссе",
-      "geometry_id": "osm-way-93057745",
+      "feature_id": "osm-bus-13766528-chain-0",
+      "name": "Автобус 21: вокзал «Новосибирск-Главный» - УМ-3",
+      "geometry_id": "osm-bus-13766528-chain-0",
       "anchor_values": {
         "transport_demand": 15000,
         "infrastructure_load": 54
@@ -240,9 +240,9 @@
       "missing_years": {}
     },
     {
-      "feature_id": "osm-way-51272618",
-      "name": "проспект Академика Лаврентьева",
-      "geometry_id": "osm-way-51272618",
+      "feature_id": "osm-bus-13761753-chain-0",
+      "name": "Автобус 68: улица Твардовского - Речной вокзал",
+      "geometry_id": "osm-bus-13761753-chain-0",
       "anchor_values": {
         "transport_demand": 22000,
         "infrastructure_load": 85
@@ -285,7 +285,7 @@
       "end_year": 2030,
       "severity": "high",
       "affected_feature_ids": [
-        "osm-way-80223228"
+        "osm-bus-18674224-chain-0"
       ],
       "metric": "transport_demand",
       "scenario": "baseline",
@@ -297,7 +297,7 @@
       "end_year": 2030,
       "severity": "medium",
       "affected_feature_ids": [
-        "osm-way-27495156"
+        "osm-bus-1694925-chain-0"
       ],
       "metric": "infrastructure_load",
       "scenario": "baseline",
@@ -307,12 +307,12 @@
   ],
   "geography_assets": [
     "districts.geojson",
-    "roads.geojson"
+    "bus_corridors.geojson"
   ],
   "reference_points_asset": "stops.geojson",
   "geography": {
-    "description": "Десять районов Новосибирска по слою региональной государственной ГИС; дороги, здания, водные объекты и станции — OpenStreetMap. Геометрия не восстановлена по растровому примеру. Статистические значения отдельно помечены как демонстрационные.",
-    "geography_version": "nsk-geography-2026-11-09",
+    "description": "Границы десяти районов из региональной ГИС. Автобусные коридоры собраны из связанных дорожных участков OpenStreetMap. Значения показателей в планировании демонстрационные.",
+    "geography_version": "nsk-geography-2026-11-11",
     "is_synthetic": false,
     "sources": [
       {
@@ -346,6 +346,17 @@
         "feature_count": 35048,
         "description": "Автомобильные дороги OpenStreetMap; класс дороги передан в kind.",
         "asset_path": "geography/roads.geojson"
+      },
+      {
+        "id": "bus-routes",
+        "name": "Автобусные маршруты",
+        "source_id": "osm",
+        "geometry_types": [
+          "LineString"
+        ],
+        "feature_count": 559,
+        "description": "Связные цепочки дорожных участков из автобусных отношений OpenStreetMap.",
+        "asset_path": "geography/bus_routes.geojson"
       },
       {
         "id": "buildings",
